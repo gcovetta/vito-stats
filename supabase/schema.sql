@@ -50,3 +50,11 @@ begin
     alter publication supabase_realtime add table public.docs;
   end if;
 end $$;
+
+-- Keepalive: función mínima que el workflow de GitHub llama 2 veces por semana
+-- para que Supabase no pause el proyecto gratis por inactividad (7 días).
+-- No expone datos: solo hace una consulta real a la base y devuelve la hora.
+create or replace function public.keepalive() returns timestamptz
+language sql stable as $$ select now() from (select 1) x $$;
+revoke all on function public.keepalive() from public;
+grant execute on function public.keepalive() to anon, authenticated;
