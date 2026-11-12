@@ -3,5 +3,5 @@
 // La anon key es pública por diseño: la seguridad la dan el login y las reglas (RLS).
 window.VITO_CONFIG = {
   SUPABASE_URL: "https://vimmydvcqolanafwdrtn.supabase.co",
-  SUPABASE_ANON_KEY: "PEGAR_ANON_KEY"
+  SUPABASE_ANON_KEY: "sb_publishable_KP1fKkHimht5MRN2u4bTfg_ySrEQP-2"
 };
