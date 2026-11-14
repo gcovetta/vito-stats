@@ -682,7 +682,7 @@ async function placa(id){
 /* ---------- Asistencias, minutos, estrellas, compañeros, racha ---------- */
 const STAR='<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path>';
 const starsH=n=>n?`<span class="stars" role="img" aria-label="${n} de 5 estrellas">${[1,2,3,4,5].map(i=>`<svg viewBox="0 0 24 24" class="${i<=n?"on":""}" aria-hidden="true">${STAR}</svg>`).join("")}</span>`:"";
-const MINS=["Todo el partido","Un tiempo","Menos de un tiempo","No jugó"];
+const MINS=["Todo el partido","Casi todo el partido","Un tiempo","Menos de un tiempo","No jugó"];
 const otrosTxt=o=>(o||[]).map(x=>x.g>1?`${x.n} ${x.g}`:x.n).join(", ");
 function parseOtros(s){return String(s||"").split(/[,;\n]/).map(t=>t.trim()).filter(Boolean).map(t=>{const m=t.match(/^(.*?)[\s(x×]*(\d+)\)?$/i);const n=(m?m[1]:t).trim(),g=m?Math.max(1,+m[2]):1;return n?{n,g}:null}).filter(Boolean)}
 function extrasH(p){const a=[];
