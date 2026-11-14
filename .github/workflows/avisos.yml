@@ -1,0 +1,27 @@
+# Manda el aviso de partido al celular: la noche anterior y la mañana del partido.
+name: Avisos de partido
+
+on:
+  schedule:
+    - cron: "7 23 * * *"   # todos los días 20:07 (hora Argentina): avisa los partidos de mañana
+    - cron: "7 11 * * *"   # todos los días 8:07: avisa los partidos de hoy
+  workflow_dispatch:
+
+jobs:
+  avisar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: scripts
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+      - name: Enviar avisos
+        env:
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+        run: node notify.mjs ${{ github.event.schedule == '7 11 * * *' && '--hoy' || '' }}

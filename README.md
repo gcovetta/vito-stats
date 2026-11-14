@@ -25,3 +25,15 @@ Abrir el link en **Safari** → botón **Compartir** → **Agregar a inicio**. A
 - `.github/workflows/keepalive.yml`: lunes y jueves llama a `keepalive()` en Supabase para que el proyecto gratis no se pause. Si pasan 45 días sin commits, hace un commit de mantenimiento para que GitHub no desactive el workflow.
 - Videos de goles: bucket privado `videos` en Supabase Storage (`supabase/videos.sql`). Se suben desde el formulario del partido, uno por gol, y se ven desde el fixture, Inicio y la pestaña Vito.
 - Extras: logros, próximo objetivo, placa del partido para compartir (se dibuja en el teléfono), comparación mes a mes de las canilleras, mapa de goles (campo `pos` por gol), historial por rival y resumen de temporada.
+
+## Automatizaciones (GitHub Actions)
+
+Necesitan secretos en **Settings → Secrets and variables → Actions**:
+
+- `SUPABASE_SERVICE_KEY`: la clave **secret** de Supabase (`sb_secret_…`). Nunca va en el código.
+- `VAPID_PRIVATE_KEY`: la clave privada de los avisos.
+
+Workflows:
+
+- **Actualizar desde ADUES** (`adues.yml`): lee la página pública del torneo y actualiza tabla, goleadores y fixture de La Martona. No toca goles de Vito ni nada cargado a mano. Tiene un modo "prueba" que solo muestra lo que leyó. Para otro torneo, cambiar `scripts/sync.config.json`.
+- **Avisos de partido** (`avisos.yml`): notificación al celular la noche anterior y la mañana del partido, a los teléfonos que tocaron "Activar avisos" en Ajustes.

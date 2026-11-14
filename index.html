@@ -368,6 +368,8 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
     <div class="settings">
       <div class="who" id="whoAmI"></div>
       <label class="btn" style="display:grid;place-items:center;color:var(--fg);font-size:15px;cursor:pointer">Cambiar foto de Vito<input type="file" accept="image/*" id="fotoIn" hidden></label>
+      <button type="button" class="btn" id="pushBtn">Activar avisos de partido en este teléfono</button>
+      <div class="who" id="pushMsg"></div>
       <div class="two"><button type="button" class="btn" id="impBtn">Importar datos</button><button type="button" class="btn" id="outBtn">Cerrar sesión</button></div>
       <div class="who" id="instHint"></div>
     </div>
@@ -1118,6 +1120,21 @@ $("#addT").onclick=()=>torneoForm();
 $("#addP").onclick=()=>partidoForm();
 $("#impBtn").onclick=()=>importForm();
 $("#seasonBtn").onclick=()=>seasonView();
+// Avisos de partido (notificaciones push)
+$("#pushBtn").onclick=async()=>{
+  const msg=t=>{$("#pushMsg").textContent=t};
+  try{
+    if(!("serviceWorker" in navigator)||!("PushManager" in window)||!("Notification" in window)){msg("Acá no se pueden activar. En iPhone, primero agregá la app a la pantalla de inicio y abrila desde el ícono.");return}
+    if(!CFG.VAPID_PUBLIC_KEY){msg("Falta configurar la clave de avisos.");return}
+    if(await Notification.requestPermission()!=="granted"){msg("No diste permiso para los avisos. Podés cambiarlo en los ajustes del teléfono.");return}
+    const reg=await navigator.serviceWorker.ready;
+    const key=Uint8Array.from(atob((CFG.VAPID_PUBLIC_KEY+"=".repeat((4-CFG.VAPID_PUBLIC_KEY.length%4)%4)).replace(/-/g,"+").replace(/_/g,"/")),c=>c.charCodeAt(0));
+    const sub=(await reg.pushManager.getSubscription())||(await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:key}));
+    const j=sub.toJSON(), {data:{session}}=await sb.auth.getSession();
+    await put("push",j.endpoint.replace(/[^a-zA-Z0-9]/g,"").slice(-60),{sub:j,quien:session?.user?.email||"",creado:new Date().toISOString()});
+    msg("Listo: este teléfono va a recibir un aviso la noche anterior y la mañana de cada partido.");
+  }catch(e){msg("No se pudieron activar los avisos ("+(e.message||e)+").")}
+};
 // Foto de la ficha: recorta un cuadrado centrado y la guarda chica dentro del perfil
 $("#fotoIn").onchange=async e=>{
   const f=e.target.files[0]; e.target.value=""; if(!f)return;
