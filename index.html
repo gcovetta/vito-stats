@@ -396,7 +396,15 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 <div class="tab" id="tab-partidos" hidden>
 <main class="wrap">
   <section>
-    <h2>Partidos <small>amistosos y sin fecha de torneo</small></h2>
+    <h2>Partidos <small id="pCount"></small></h2>
+    <div class="filters" role="group" aria-label="Filtrar partidos">
+      <button type="button" data-pf="all" aria-pressed="true">Todos</button>
+      <button type="button" data-pf="La Martona" aria-pressed="false">La Martona</button>
+      <button type="button" data-pf="Huracán" aria-pressed="false">Huracán</button>
+      <button type="button" data-pg="1" aria-pressed="false">Con goles de Vito</button>
+      <button type="button" data-pg="2" aria-pressed="false">Falta video</button>
+    </div>
+    <input id="pSearch" type="search" placeholder="Buscar rival…" aria-label="Buscar rival" style="margin-bottom:10px">
     <div class="sheet" id="matches"><div class="empty">Todavía no hay partidos. Cargá uno con “+ Partido”.</div></div>
   </section>
   <section id="rivSec" hidden><h2>Historial por rival</h2><div class="sheet" id="rivals"></div></section>
@@ -687,6 +695,7 @@ function extrasH(p){const a=[];
 function racha(){const L=partidos.filter(p=>p.fecha&&p.gf!=null&&p.gc!=null&&p.jugo!==false&&p.minutos!=="No jugó").sort((a,b)=>a.fecha.localeCompare(b.fecha));
   let best=0,run=0;L.forEach(p=>{run=(p.golesVito||0)>0?run+1:0;best=Math.max(best,run)});return{cur:run,best,n:L.length}}
 
+let pFil="all", pG=0, pQuery="";
 let rq=0; function render(){cancelAnimationFrame(rq);rq=requestAnimationFrame(doRender)}
 function doRender(){
   const tot=torneos.reduce((a,t)=>a+(t.goles||0),0);
@@ -748,17 +757,22 @@ function doRender(){
       <div class="fxsum"><span class="gt">${w} G · ${d} E · ${l} P</span><span class="gt">Goles ${gf}-${gc}</span><span class="gt">${fx.reduce((a,p)=>a+(p.golesVito||0),0)} de Vito</span>${T.posicion?`<span class="gt">${esc(T.posicion)}</span>`:""}${T.goleo?`<span class="tag cup">${esc(T.goleo)}</span>`:""}</div>
       <div class="sheet">${rows}</div>${T.tabla?`<details class="tbl"${T.id&&T.id===openTbl?" open":""} data-tbl="${esc(T.id||"")}"><summary>Tabla de posiciones${T.tablaAl&&T.tablaAl!=="final"?` <small style="color:var(--muted);font-weight:400">al ${esc(T.tablaAl)}</small>`:""}</summary>${T.tabla.map(zn=>`<div class="scroll"><table><caption>${esc(zn.zona)}</caption><thead><tr><th>#</th><th>Equipo</th><th>Pts</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th></tr></thead><tbody>${zn.filas.map((f,i)=>`<tr class="${f.eq.toLowerCase().replace(/á/g,"a").includes(T.club.toLowerCase().replace(/á/g,"a"))?"me":""}"><td>${i+1}</td><td>${esc(f.eq)}</td><td class="pts">${f.pts}</td><td>${f.pj}</td><td>${f.g}</td><td>${f.e}</td><td>${f.p}</td><td>${f.gf}</td><td>${f.gc}</td><td>${f.gf-f.gc>0?"+":""}${f.gf-f.gc}</td></tr>`).join("")}</tbody></table></div>`).join("")}</details>`:""}</section>`}).join("");
   const pend=p=>p.gf==null&&p.gc==null&&p.golesVito==null;
-  const ps=partidos.filter(p=>!p.fechaN).sort((a,b)=>(pend(b)-pend(a))||(b.fecha||"").localeCompare(a.fecha||""));
+  const tord=Object.fromEntries(torneos.map(t=>[t.id,t.orden||0])), nvid=p=>(p.videos||[]).filter(Boolean).length, qs=rivKey(pQuery);
+  const ps=partidos.filter(p=>(pFil==="all"||p.club===pFil)&&(pG!==1||(p.golesVito||0)>0)&&(pG!==2||((p.golesVito||0)>nvid(p)))&&(!qs||rivKey(p.rival).includes(qs)))
+    .sort((a,b)=>(pend(b)-pend(a))||(!!b.fecha-!!a.fecha)||(b.fecha||"").localeCompare(a.fecha||"")||(tord[b.torneoId]||0)-(tord[a.torneoId]||0)||(b.fechaN||0)-(a.fechaN||0));
+  $("#pCount").textContent=`${ps.length} de ${partidos.length} · tocá uno para editarlo`;
+  document.querySelectorAll("[data-pf]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.pf===pFil));
+  document.querySelectorAll("[data-pg]").forEach(b=>b.setAttribute("aria-pressed",+b.dataset.pg===pG));
   const tn=Object.fromEntries(torneos.map(t=>[t.id,t.nombre]));
   const MES=["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
   $("#matches").innerHTML=ps.length?ps.map(p=>{
     const [y,mo,d]=(p.fecha||"").split("-");
-    return `<div class="match">
-      <div class="d"><b>${+d||"?"}</b>${MES[+mo-1]||""} ${y?y.slice(2):""}</div>
+    return `<div class="match" ${canWrite?`data-editp="${esc(p.id)}" style="cursor:pointer"`:""}>
+      <div class="d">${p.fecha?`<b>${+d}</b>${MES[+mo-1]||""} ${y.slice(2)}`:`<b style="font-size:16px">s/f</b>${p.fechaN?"F"+p.fechaN:""}`}</div>
       <div class="who"><div class="t">${crest(p.club,22)}<span><b>${esc(p.club)}</b> vs ${esc(p.rival)}${p.visitante?' <small style="color:var(--muted)">(visitante)</small>':""}</span></div>
-        ${pend(p)?`<div class="balls">Próximo partido${tn[p.torneoId]?` · ${esc(tn[p.torneoId])}`:""}</div>`:`<div class="balls">${BALL.repeat(Math.min(p.golesVito||0,10))} ${p.golesVito||0} de Vito${tn[p.torneoId]?` · ${esc(tn[p.torneoId])}`:""}</div>`}${chips(p)?`<div style="margin-top:4px">${chips(p)}</div>`:""}${extrasH(p)}</div>
+        ${pend(p)?`<div class="balls">Próximo partido${tn[p.torneoId]?` · ${esc(tn[p.torneoId])}`:""}</div>`:`<div class="balls">${BALL.repeat(Math.min(p.golesVito||0,10))} ${p.golesVito==null?"Sin cargar goles":(p.golesVito||0)+" de Vito"}${p.fechaN&&p.fecha?" · F"+p.fechaN:""}${tn[p.torneoId]?` · ${esc(tn[p.torneoId])}`:""}${(p.golesVito||0)>0?` · <b style="color:${nvid(p)>=p.golesVito?"var(--martona)":"var(--muted)"}">${nvid(p)}/${p.golesVito} videos</b>`:""}</div>`}${chips(p)?`<div style="margin-top:4px">${chips(p)}</div>`:""}${extrasH(p)}</div>
       <div style="text-align:right">${pend(p)?`<span class="tag cup">Próximo</span>`:`<div class="score">${p.gf??"–"}–${p.gc??"–"}</div>`}${canWrite?`<button class="linkbtn" type="button" data-editp="${esc(p.id)}">Editar</button>`:""}</div>
-    </div>`}).join(""):`<div class="empty">Todavía no hay partidos. Cargá uno con “+ Partido”.</div>`;
+    </div>`}).join(""):`<div class="empty">${partidos.length?"Ningún partido coincide con ese filtro.":"Todavía no hay partidos. Cargá uno con “+ Partido”."}</div>`;
   $("#addT").hidden=$("#addP").hidden=!canWrite;
   renderInicio(); renderVito(); renderExtras();
 }
@@ -1107,6 +1121,8 @@ async function delPartido(id,btn){
 
 document.addEventListener("click",e=>{
   const vd=e.target.closest("[data-vid]"); if(vd){e.stopPropagation();const [a,b]=vd.dataset.vid.split(/:(?=\d+$)/);playVideo(a,+b);return}
+  const pf=e.target.closest("[data-pf]"); if(pf){pFil=pf.dataset.pf;render();return}
+  const pg=e.target.closest("[data-pg]"); if(pg){pG=pG===+pg.dataset.pg?0:+pg.dataset.pg;render();return}
   const pl=e.target.closest("[data-placa]"); if(pl){placa(pl.dataset.placa);return}
   const rv=e.target.closest("[data-riv]"); if(rv){rivalView(rv.dataset.riv);return}
   const s=e.target.closest("[data-step]"); if(s){step(s.dataset.id,+s.dataset.step);return}
@@ -1120,6 +1136,7 @@ $("#addT").onclick=()=>torneoForm();
 $("#addP").onclick=()=>partidoForm();
 $("#impBtn").onclick=()=>importForm();
 $("#seasonBtn").onclick=()=>seasonView();
+$("#pSearch").addEventListener("input",e=>{pQuery=e.target.value;render()});
 // Avisos de partido (notificaciones push)
 $("#pushBtn").onclick=async()=>{
   const msg=t=>{$("#pushMsg").textContent=t};
