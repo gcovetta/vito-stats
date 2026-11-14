@@ -269,6 +269,26 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 .hbar b{font-family:var(--display);font-size:17px;font-weight:800;text-align:right}
 .next{border-color:var(--accent)!important}
 .next .when{margin-left:auto;font-family:var(--display);font-weight:800;font-size:20px;line-height:1;text-align:right;text-transform:uppercase;flex:none}
+.ach{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ac{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-width:0}
+.ac .ai{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--bg);color:var(--muted);border:2px dashed var(--line)}
+.ac .ai svg{width:24px;height:24px}
+.ac b{font-size:13px;line-height:1.15}
+.ac span.d{font-size:11px;color:var(--muted);line-height:1.2}
+.ac.on{border-color:var(--accent)}
+.ac.on .ai{background:var(--accent);color:#1d1600;border:2px solid var(--accent)}
+.goals{display:grid;gap:12px}
+.goal .gh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:14px;margin-bottom:5px}
+.goal .gh b{font-weight:600}
+.goal .gh span{font-family:var(--display);font-weight:800;font-size:17px;white-space:nowrap}
+.goal .tr{height:12px;border-radius:6px;background:var(--line);overflow:hidden}
+.goal .tr i{display:block;height:100%;border-radius:6px;background:var(--accent)}
+.up{color:var(--martona);font-weight:700} .dn{color:var(--danger);font-weight:700} .eq{color:var(--muted);font-weight:600}
+.rvrow{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;padding:12px 14px;border:0;border-top:1px solid var(--line);background:none;text-align:left}
+.rvrow:first-child{border-top:0}
+.rvrow b{display:block;font-size:15px}
+.rvrow span{font-size:12px;color:var(--muted)}
+.rvrow em{font-style:normal;font-family:var(--display);font-weight:800;font-size:20px;white-space:nowrap}
 .settings{display:grid;gap:10px}
 .settings .who{font-size:13px;color:var(--muted)}
 .sync{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);right:12px;z-index:7;font-size:11px;font-weight:600;background:rgba(0,0,0,.35);color:#fff;border-radius:999px;padding:3px 9px}
@@ -302,6 +322,7 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
     </div>
   </header>
   <div class="tiles2" id="hTiles"></div>
+  <section id="goalSec" hidden style="padding-block:12px 0"><div class="card"><h2>Próximo objetivo</h2><div class="goals" id="goals"></div></div></section>
   <section id="formSec" hidden style="padding-block:12px 0"><div class="card"><h2>Últimos 5 partidos <small style="white-space:nowrap">punto = gol</small></h2><div class="formrow" id="form"></div></div></section>
   <section id="howSec" hidden style="padding-block:12px 0"><div class="card"><h2>Cómo los hace</h2><div class="hbars" id="howBars"></div></div></section>
   <section id="lastSec" hidden><h2>Último partido</h2><div class="last" id="last"></div></section>
@@ -316,12 +337,16 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 <main class="wrap">
   <div class="cardwrap"><div style="width:100%;display:flex;flex-direction:column;align-items:center"><div class="shield" id="shield"><div class="in"></div></div><div class="cardnote" id="cardnote"></div></div></div>
   <div class="kgrid" id="kgrid"></div>
+  <section><h2>Logros <small id="achN"></small></h2><div class="ach" id="ach"></div></section>
   <section id="agSec" hidden><h2>Su semana</h2><div class="sheet" id="agenda"></div></section>
   <section><h2>Evolución <small>canilleras INSAIT JOY</small></h2><div id="charts"><div class="empty">Cargando…</div></div></section>
+  <section id="cmpSec" hidden><h2>Cómo viene <small id="cmpL"></small></h2><div class="recs" id="cmp"></div></section>
   <section><h2>Récords</h2><div class="recs" id="recs"></div></section>
   <section id="vidSec" hidden><h2>Goles en video</h2><div class="vgrid" id="vgrid"></div></section>
+  <section><h2>Mapa de goles <small id="mapN"></small></h2><div class="card" id="gmap"></div></section>
   <section><h2>Cómo hace los goles</h2><div class="how" id="how"></div></section>
   <section id="trySec" hidden><h2>Trayectoria</h2><div class="lines" id="tray"></div></section>
+  <section><button type="button" class="btn primary" id="seasonBtn" style="width:100%;height:50px">Ver resumen de la temporada</button></section>
   <section>
     <h2>Ajustes</h2>
     <div class="settings">
@@ -355,6 +380,7 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
     <h2>Partidos <small>amistosos y sin fecha de torneo</small></h2>
     <div class="sheet" id="matches"><div class="empty">Todavía no hay partidos. Cargá uno con “+ Partido”.</div></div>
   </section>
+  <section id="rivSec" hidden><h2>Historial por rival</h2><div class="sheet" id="rivals"></div></section>
 </main>
 </div>
 <div class="wrap"><div class="status" id="status"></div></div>
@@ -471,6 +497,151 @@ function makeThumb(file){return new Promise(res=>{
 })}
 async function rmVideos(paths){paths=paths.filter(Boolean);if(paths.length){try{await sb.storage.from(VB).remove(paths)}catch(_){}}}
 
+/* ---------- Logros, objetivos, mapa de goles, rivales, resumen y placa ---------- */
+const rivName=s=>String(s||"").replace(/\s*\(.*\)\s*$/,"").trim();
+const rivKey=s=>rivName(s).normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().replace(/[."]/g,"").replace(/\s+/g," ");
+const IC={ball:'<circle cx="12" cy="12" r="9"></circle><path d="M12 7.5l4 3-1.5 4.5h-5L8 10.5z"></path>',star:'<path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"></path>',cup:'<path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z"></path><path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3"></path>',bolt:'<path d="M13 2L4 14h7l-1 8 9-12h-7z"></path>',cam:'<rect x="3" y="6" width="13" height="12" rx="2"></rect><path d="M16 10l5-3v10l-5-3z"></path>'};
+const svgI=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" aria-hidden="true">${IC[k]}</svg>`;
+const dotS=q=>`<circle cx="${q.x}" cy="${q.y}" r="2.4" fill="#e8b923" stroke="#1d1600" stroke-width=".6"></circle>`;
+const pitch=(dots,extra="")=>`<svg viewBox="0 0 100 70" ${extra} role="img" aria-label="Media cancha, el arco está arriba" style="width:100%;display:block;border-radius:8px;background:#1f5a34;touch-action:manipulation"><g fill="none" stroke="rgba(244,248,242,.7)" stroke-width=".6"><rect x="1" y="1" width="98" height="68"></rect><rect x="22" y="1" width="56" height="24"></rect><rect x="38" y="1" width="24" height="8"></rect><path d="M40 25a11 11 0 0 0 20 0"></path><path d="M36 69a14 14 0 0 1 28 0"></path></g><rect x="44" y="0" width="12" height="1.6" fill="#f4f8f2"></rect><circle cx="50" cy="17" r=".8" fill="#f4f8f2"></circle>${dots}</svg>`;
+function baseStats(){
+  const tot=torneos.reduce((a,t)=>a+(t.goles||0),0);
+  const ct={};partidos.forEach(p=>(p.tipos||[]).forEach(t=>{if(t&&t!=="Sin dato")ct[t]=(ct[t]||0)+1}));
+  const hat=partidos.filter(p=>(p.golesVito||0)>=3).length, pok=partidos.filter(p=>(p.golesVito||0)>=4).length;
+  const tit=torneos.filter(t=>t.campeon).length+tray.reduce((a,L)=>a+(L.clubes||[]).reduce((b,c)=>b+(c.titulos||[]).length,0),0);
+  const maxT=Math.max(0,...torneos.map(t=>t.goles||0)), L=fisList();
+  const mx=k=>Math.max(0,...L.map(x=>+x[k]||0));
+  const nv=partidos.reduce((a,p)=>a+(p.videos||[]).filter(Boolean).length,0);
+  return {tot,ct,hat,pok,tit,maxT,L,vmax:mx("vel_max_kmh"),dmax:mx("distancia_m"),nmax:mx("puntuacion"),nv};
+}
+function renderExtras(){
+  const S=baseStats(), c=k=>S.ct[k]||0;
+  // Logros
+  const A=[
+    ["ball","Primer gol","Hacer un gol",S.tot>=1],
+    ["ball","10 goles","Llegar a 10 goles",S.tot>=10,S.tot,10],
+    ["ball","25 goles","Llegar a 25 goles",S.tot>=25,S.tot,25],
+    ["ball","50 goles","Llegar a 50 goles",S.tot>=50,S.tot,50],
+    ["ball","100 goles","Llegar a 100 goles",S.tot>=100,S.tot,100],
+    ["star","Hat-trick","3 goles en un partido",S.hat>=1],
+    ["star","Póker","4 goles en un partido",S.pok>=1],
+    ["star","Triple hat-trick","3 partidos con 3 goles o más",S.hat>=3,S.hat,3],
+    ["bolt","Gol olímpico","Gol directo de córner",c("Olímpico")>=1],
+    ["bolt","De cabeza","Hacer un gol de cabeza",c("Cabeza")>=1],
+    ["bolt","Tiro libre","Hacer un gol de tiro libre",c("Tiro libre")>=1],
+    ["bolt","De lejos","Gol desde afuera del área",c("De lejos")>=1],
+    ["bolt","Gambeteador","5 goles de gambeta",c("Gambeta")>=5,c("Gambeta"),5],
+    ["cup","Campeón","Ganar un título",S.tit>=1],
+    ["cup","Bicampeón","Ganar 2 títulos",S.tit>=2,S.tit,2],
+    ["cup","Goleador","10 goles en un mismo torneo",S.maxT>=10,S.maxT,10],
+    ["bolt","Rayo","Llegar a 25 km/h",S.vmax>=25,S.vmax,25],
+    ["bolt","Motor","Correr 5 km en un partido",S.dmax>=5000,(S.dmax/1000).toFixed(1).replace(".",","),5],
+    ["star","Figura","Nota 80 o más en un partido",S.nmax>=80,S.nmax,80],
+    ["cam","Gol filmado","Subir el video de un gol",S.nv>=1],
+  ];
+  $("#achN").textContent=`${A.filter(a=>a[3]).length} de ${A.length}`;
+  $("#ach").innerHTML=[...A].sort((a,b)=>b[3]-a[3]).map(([i,t,d,ok,cur,goal])=>`<div class="ac${ok?" on":""}"><span class="ai">${svgI(i)}</span><b>${esc(t)}</b><span class="d">${ok?"Conseguido":esc(d)+(goal&&cur?` · va ${cur} de ${goal}`:"")}</span></div>`).join("");
+  // Comparación: último mes medido vs el anterior
+  const byM={};S.L.forEach(x=>(byM[x.fecha.slice(0,7)]=byM[x.fecha.slice(0,7)]||[]).push(x));
+  const ms=Object.keys(byM).sort(); $("#cmpSec").hidden=ms.length<2;
+  if(ms.length>=2){const a=byM[ms[ms.length-1]],b=byM[ms[ms.length-2]];
+    const av=(L,k)=>L.reduce((s,x)=>s+(+x[k]||0),0)/L.length, mxx=(L,k)=>Math.max(...L.map(x=>+x[k]||0));
+    const M=[["Nota promedio",av(a,"puntuacion"),av(b,"puntuacion"),"",0],["Velocidad máxima",mxx(a,"vel_max_kmh"),mxx(b,"vel_max_kmh")," km/h",0],["Distancia promedio",av(a,"distancia_m")/1000,av(b,"distancia_m")/1000," km",1],["Patada más fuerte",mxx(a,"patada_max_kg"),mxx(b,"patada_max_kg")," kg",0]];
+    const f=(v,d)=>v.toFixed(d).replace(".",",");
+    $("#cmpL").textContent=`${MESES[+ms[ms.length-1].slice(5)-1]} vs ${MESES[+ms[ms.length-2].slice(5)-1]}`;
+    $("#cmp").innerHTML=M.map(([t,x,y,u,d])=>{const df=+(x-y).toFixed(d);return `<div><span>${t}</span><b>${f(x,d)}${u}</b><span class="${df>0?"up":df<0?"dn":"eq"}">${df>0?"▲ subió "+f(df,d):df<0?"▼ bajó "+f(-df,d):"= igual"}</span></div>`}).join("")}
+  // Mapa de goles
+  const pts=[];partidos.forEach(p=>(p.pos||[]).forEach(q=>{if(q)pts.push(q)}));
+  $("#mapN").textContent=pts.length?`${pts.length} ${pts.length===1?"gol marcado":"goles marcados"}`:"";
+  $("#gmap").innerHTML=pitch(pts.map(dotS).join(""))+(pts.length?"":`<p class="status" style="padding:8px 0 0;margin:0">Todavía no hay goles marcados. Al editar un partido, tocá “Marcar desde dónde fue” en cada gol.</p>`);
+  // Rivales
+  const R={};partidos.forEach(p=>{if(!p.rival)return;const k=rivKey(p.rival);(R[k]=R[k]||{k,name:rivName(p.rival),l:[]}).l.push(p)});
+  const RL=Object.values(R).sort((a,b)=>b.l.length-a.l.length||a.name.localeCompare(b.name));
+  $("#rivSec").hidden=!RL.length;
+  $("#rivals").innerHTML=RL.map(r=>{let w=0,d=0,l=0,g=0;r.l.forEach(p=>{g+=p.golesVito||0;if(p.gf!=null&&p.gc!=null){p.gf>p.gc?w++:p.gf<p.gc?l++:d++}});
+    return `<button type="button" class="rvrow" data-riv="${esc(r.k)}"><span><b>${esc(r.name)}</b><span>${r.l.length} ${r.l.length===1?"partido":"partidos"} · ${w} G · ${d} E · ${l} P</span></span><em>${g} ${g===1?"gol":"goles"}</em></button>`}).join("");
+}
+function rivalView(k){
+  const L=partidos.filter(p=>p.rival&&rivKey(p.rival)===k).sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")); if(!L.length)return;
+  const tn=Object.fromEntries(torneos.map(t=>[t.id,t.nombre]));
+  $("#ov").innerHTML=`<div class="form"><div class="wrap"><h3>Contra ${esc(rivName(L[0].rival))}</h3>
+    <div class="sheet">${L.map(p=>{const j=p.gf!=null&&p.gc!=null;return `<div class="match"><div class="d" style="min-width:52px">${p.fecha?`<b style="font-size:18px">${p.fecha.slice(8)}/${p.fecha.slice(5,7)}</b>${p.fecha.slice(0,4)}`:"<b style=\"font-size:16px\">s/f</b>"}</div>
+      <div class="who"><div class="t">${crest(p.club,22)}<span><b>${esc(p.club)}</b> · ${p.visitante?"visitante":"local"}</span></div><div class="balls">${esc(tn[p.torneoId]||"")}</div><div class="balls">${p.golesVito?BALL.repeat(Math.min(p.golesVito,6))+" "+p.golesVito+" de Vito":"Sin goles de Vito"}${chips(p)}</div></div>
+      <div class="score">${j?p.gf+"–"+p.gc:"–"}</div></div>`}).join("")}</div>
+    <div class="actions"><div class="r"><button type="button" class="btn" id="rvClose">Cerrar</button></div></div></div></div>`;
+  $("#ov").hidden=false; $("#rvClose").onclick=close;
+}
+function seasonView(){
+  const yrs=partidos.map(p=>(p.fecha||"").slice(0,4)).filter(Boolean).sort(); const Y=yrs.length?yrs[yrs.length-1]:String(new Date().getFullYear());
+  const T=torneos.filter(t=>String(t.temporada||"")===Y), P=partidos.filter(p=>(p.fecha||"").startsWith(Y)&&p.gf!=null&&p.gc!=null&&p.jugo!==false);
+  const goles=T.reduce((a,t)=>a+(t.goles||0),0); let w=0,d=0,l=0;P.forEach(p=>{p.gf>p.gc?w++:p.gf<p.gc?l++:d++});
+  const best=[...P].sort((a,b)=>(b.golesVito||0)-(a.golesVito||0))[0];
+  const S=baseStats(), fav=Object.entries(S.ct).sort((a,b)=>b[1]-a[1])[0];
+  const L=S.L.filter(x=>x.fecha.startsWith(Y)), top=k=>L.reduce((b,x)=>(+x[k]||0)>(+b[k]||0)?x:b,L[0]);
+  const V=[];P.forEach(p=>(p.videos||[]).forEach((v,i)=>{if(v)V.push({p,i})}));
+  const tile=(a,b,c)=>`<div><span>${a}</span><b>${b}</b><span>${c||""}</span></div>`;
+  $("#ov").innerHTML=`<div class="form"><div class="wrap">
+    <h3>Temporada ${Y}</h3>
+    <div class="pitch" style="border-radius:14px"><div class="hero" style="padding:18px"><div class="total"><div class="n" style="font-size:96px">${goles}</div><div class="lbl">Goles<small>${T.filter(t=>t.tipo!=="amistoso").length} torneos · ${T.filter(t=>t.campeon).length} ${T.filter(t=>t.campeon).length===1?"título":"títulos"}</small></div></div></div></div>
+    <div class="recs">
+      ${tile("Partidos con fecha",P.length,`${w} G · ${d} E · ${l} P`)}
+      ${tile("Hat-tricks",S.hat,S.pok?`${S.pok} de 4 goles o más`:"")}
+      ${best&&best.golesVito?tile("Mejor partido",`${best.golesVito} goles`,`vs ${esc(rivName(best.rival))} · ${fmtF(best.fecha)}`):""}
+      ${fav?tile("Su gol preferido",esc(fav[0]),`${fav[1]} ${fav[1]===1?"vez":"veces"}`):""}
+      ${L.length?tile("Velocidad máxima",`${top("vel_max_kmh").vel_max_kmh} km/h`,fmtF(top("vel_max_kmh").fecha)):""}
+      ${L.length?tile("Mejor nota",top("puntuacion").puntuacion,fmtF(top("puntuacion").fecha)):""}
+    </div>
+    ${barMeses()?`<div class="chart" style="margin:0"><h3>Goles por mes</h3><p>Solo partidos con fecha cargada.</p>${barMeses()}</div>`:""}
+    ${V.length?`<div><div class="lab" style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Goles en video</div>${V.map(({p,i})=>{const t=(p.tipos||[])[i];return `<button type="button" class="gt vd" style="font-size:13px;padding:6px 12px;margin:0 6px 6px 0" data-vid="${esc(p.id)}:${i}">▶ ${esc(t&&t!=="Sin dato"?t:"Gol")} vs ${esc(rivName(p.rival))}</button>`}).join("")}</div>`:""}
+    <div class="actions"><div class="r"><button type="button" class="btn" id="ssClose">Cerrar</button></div></div></div></div>`;
+  $("#ov").hidden=false; $("#ssClose").onclick=close;
+}
+/* Placa del partido: imagen 1080×1350 dibujada en el teléfono, para compartir */
+async function placa(id){
+  const p=partidos.find(x=>x.id===id); if(!p||p.gf==null||p.gc==null)return;
+  $("#ov").innerHTML=`<div class="form"><div class="wrap"><h3>Placa del partido</h3><div id="plc" class="empty">Armando la imagen…</div><div class="err" id="plErr"></div><div class="actions"><div class="r"><button type="button" class="btn" id="plX">Cerrar</button><a class="btn" id="plDl" hidden style="display:grid;place-items:center;text-decoration:none;color:var(--fg)">Descargar</a><button type="button" class="btn primary" id="plSh" hidden>Compartir</button></div></div></div></div>`;
+  $("#ov").hidden=false; $("#plX").onclick=close;
+  const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
+  try{await Promise.all([document.fonts.load('800 100px "Barlow Condensed"'),document.fonts.load('600 40px "Archivo"')])}catch(_){}
+  const F=(w,s)=>`${w} ${s}px "Barlow Condensed","Arial Narrow",sans-serif`;
+  const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,"#2a7a45");g.addColorStop(.5,"#1f5a34");g.addColorStop(1,"#103722");x.fillStyle=g;x.fillRect(0,0,W,H);
+  x.fillStyle="rgba(255,255,255,.045)";for(let i=90;i<W;i+=180)x.fillRect(i,0,90,H);
+  x.strokeStyle="rgba(244,248,242,.12)";x.lineWidth=5;x.beginPath();x.arc(W/2,330,410,0,7);x.stroke();
+  x.textAlign="center";x.textBaseline="middle";
+  const T=torneos.find(t=>t.id===p.torneoId);
+  x.fillStyle="#f4f8f2";x.font=F(700,40);x.fillText(((T&&T.nombre)||"").toUpperCase().slice(0,44),W/2,78);
+  const sub=[p.fechaN?"FECHA "+p.fechaN:"",p.fecha?fmtF(p.fecha).toUpperCase():""].filter(Boolean).join("  ·  ");
+  if(sub){x.font=F(800,38);const tw=x.measureText(sub).width+48;x.fillStyle="#e8b923";x.beginPath();x.roundRect(W/2-tw/2,112,tw,58,10);x.fill();x.fillStyle="#1d1600";x.fillText(sub,W/2,143)}
+  const home=p.visitante?{n:rivName(p.rival),g:p.gc,me:false}:{n:p.club,g:p.gf,me:true}, away=p.visitante?{n:p.club,g:p.gf,me:true}:{n:rivName(p.rival),g:p.gc,me:false};
+  const logo=clubes[slug(p.club)]?.logo; let img=null;
+  if(logo){img=new Image();await new Promise(r=>{img.onload=r;img.onerror=()=>{img=null;r()};img.src=logo})}
+  const drawCrest=(t,cx)=>{const cy=360,r=t.me?150:120;
+    x.beginPath();x.arc(cx,cy,r+(t.me?12:8),0,7);x.fillStyle=t.me?"#e8b923":"rgba(244,248,242,.35)";x.fill();
+    x.beginPath();x.arc(cx,cy,r,0,7);x.fillStyle=t.me?"#ffffff":"#14201a";x.fill();
+    if(t.me&&img){x.save();x.beginPath();x.arc(cx,cy,r-4,0,7);x.clip();x.drawImage(img,cx-r+4,cy-r+4,2*r-8,2*r-8);x.restore()}
+    else{x.fillStyle=t.me?"#1f5a34":"#f4f8f2";x.font=F(800,r*.8);x.fillText(t.n.split(/\s+/).filter(w=>w.length>2||/^[A-Z]/.test(w)).map(w=>w[0]).join("").slice(0,3).toUpperCase(),cx,cy+6)}
+    x.fillStyle="#f4f8f2";let fs=t.me?64:52;x.font=F(800,fs);while(x.measureText(t.n.toUpperCase()).width>470&&fs>30){fs-=4;x.font=F(800,fs)}
+    x.fillText(t.n.toUpperCase(),cx,cy+r+70)};
+  drawCrest(home,280);drawCrest(away,800);
+  x.fillStyle="#f4f8f2";x.font=F(800,330);x.fillText(`${home.g} – ${away.g}`,W/2,790);
+  const res=p.gf>p.gc?"GANADO":p.gf<p.gc?"PERDIDO":"EMPATE";
+  x.font=F(700,40);x.fillStyle="#cfe0d3";x.fillText(res,W/2,975);
+  x.fillStyle="rgba(6,14,9,.82)";x.fillRect(0,1040,W,H-1040);x.fillStyle="#e8b923";x.fillRect(0,1040,W,8);
+  const gv=p.golesVito||0;
+  if(gv){const n=Math.min(gv,8),r=30,gap=18,tw=n*2*r+(n-1)*gap;let bx=W/2-tw/2+r;
+    for(let i=0;i<n;i++){x.beginPath();x.arc(bx,1125,r,0,7);x.fillStyle="#e8b923";x.fill();x.fillStyle="#1d1600";x.beginPath();x.moveTo(bx,1109);x.lineTo(bx+15,1120);x.lineTo(bx+9,1138);x.lineTo(bx-9,1138);x.lineTo(bx-15,1120);x.closePath();x.fill();bx+=2*r+gap}
+    x.fillStyle="#f4f8f2";x.font=F(800,64);x.fillText(`${gv} ${gv===1?"GOL":"GOLES"} DE VITO`,W/2,1215);
+    const cn={};(p.tipos||[]).forEach(t=>{if(t&&t!=="Sin dato")cn[t]=(cn[t]||0)+1});const tt=Object.entries(cn).map(([t,n])=>n>1?`${t} ×${n}`:t).join("  ·  ");
+    if(tt){x.font=F(600,36);x.fillStyle="#f0c544";x.fillText(tt.toUpperCase(),W/2,1285)}
+  }else{x.fillStyle="#f4f8f2";x.font=F(800,64);x.fillText("VITO COVETTA · 10",W/2,1190)}
+  const blob=await new Promise(r=>c.toBlob(r,"image/png")); if(!$("#plc"))return;
+  const url=URL.createObjectURL(blob), name=`placa-${(p.fecha||"partido")}-${rivKey(p.rival).replace(/\s+/g,"-")}.png`;
+  $("#plc").className="";$("#plc").innerHTML=`<img alt="Placa del partido" src="${url}" style="width:100%;border-radius:12px;display:block">`;
+  const dl=$("#plDl");dl.href=url;dl.download=name;dl.hidden=false;
+  const file=new File([blob],name,{type:"image/png"});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){const b=$("#plSh");b.hidden=false;b.onclick=async()=>{try{await navigator.share({files:[file]})}catch(e){if(e&&e.name!=="AbortError")$("#plErr").textContent="No se pudo compartir. Usá Descargar."}}}
+}
+
 let rq=0; function render(){cancelAnimationFrame(rq);rq=requestAnimationFrame(doRender)}
 function doRender(){
   const tot=torneos.reduce((a,t)=>a+(t.goles||0),0);
@@ -544,7 +715,7 @@ function doRender(){
       <div style="text-align:right">${pend(p)?`<span class="tag cup">Próximo</span>`:`<div class="score">${p.gf??"–"}–${p.gc??"–"}</div>`}${canWrite?`<button class="linkbtn" type="button" data-editp="${esc(p.id)}">Editar</button>`:""}</div>
     </div>`}).join(""):`<div class="empty">Todavía no hay partidos. Cargá uno con “+ Partido”.</div>`;
   $("#addT").hidden=$("#addP").hidden=!canWrite;
-  renderInicio(); renderVito();
+  renderInicio(); renderVito(); renderExtras();
 }
 
 /* ---------- Pestañas ---------- */
@@ -573,6 +744,11 @@ function renderInicio(){
   if(cg){const dv=(cg.vito.liderGoles||0)-(cg.vito.goles||0);tl+=`<div class="tile"><span class="lab">Goleador · ${esc((cg.torneo||"").split("·")[0].trim())}</span><b>${cg.vito.pos}°</b><span class="sub">${cg.vito.goles} goles · ${dv>0?"a "+dv+" del líder":"puntero"}</span></div>`}
   tl+=`<div class="tile"><span class="lab">Hat-tricks</span><b>${hat}</b><span class="sub">${olim?olim+" gol"+(olim>1?"es olímpicos":" olímpico"):"3 o más goles en un partido"}</span></div>`;
   $("#hTiles").innerHTML=torneos.length?tl:"";
+  const totG=torneos.reduce((a,t)=>a+(t.goles||0),0), nextG=[10,20,30,40,50,75,100,150,200,300,500].find(v=>v>totG);
+  let gl="";
+  if(torneos.length&&nextG)gl+=`<div class="goal"><div class="gh"><b>Llegar a ${nextG} goles</b><span>${nextG-totG===1?"falta 1":"faltan "+(nextG-totG)}</span></div><div class="tr"><i style="width:${Math.round(totG/nextG*100)}%"></i></div></div>`;
+  if(cg&&(cg.vito.liderGoles||0)>(cg.vito.goles||0))gl+=`<div class="goal"><div class="gh"><b>Alcanzar al goleador del ${esc((cg.torneo||"").split("·")[0].trim())}</b><span>${cg.vito.goles} de ${cg.vito.liderGoles}</span></div><div class="tr"><i style="width:${Math.round(cg.vito.goles/cg.vito.liderGoles*100)}%"></i></div></div>`;
+  $("#goalSec").hidden=!gl; $("#goals").innerHTML=gl;
   // Racha: últimos 5 partidos jugados
   const u5=partidos.filter(p=>jug(p)&&p.fecha&&p.jugo!==false).sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,5).reverse();
   $("#formSec").hidden=u5.length<2;
@@ -590,7 +766,7 @@ function renderInicio(){
     const tp=(ls.tipos||[]).filter(t=>t&&t!=="Sin dato");
     $("#last").innerHTML=`<div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)"><span>${fmtF(ls.fecha)}${tn[ls.torneoId]?" · "+esc(tn[ls.torneoId]):""}</span><span class="gt">${k}</span></div>
       <div class="sc"><span class="tm">${L[0]===ls.club?crest(ls.club,30):""}${esc(L[0])}</span><b>${L[1]} – ${L[2]}</b><span class="tm" style="justify-content:flex-end">${esc(L[3])}${L[3]===ls.club?crest(ls.club,30):""}</span></div>
-      <div class="balls">${ls.golesVito?BALL.repeat(Math.min(ls.golesVito,10))+` <b style="color:var(--fg)">${ls.golesVito} de Vito</b>`:"Vito no hizo goles"}${tp.length?" · "+tp.map(esc).join(", "):""}</div>${(ls.videos||[]).some(Boolean)?`<div>${(ls.videos||[]).map((v,i)=>{if(!v)return"";const t=(ls.tipos||[])[i];return `<button type="button" class="gt vd" style="font-size:13px;padding:6px 12px;margin-top:2px" data-vid="${esc(ls.id)}:${i}">▶ Ver gol${t&&t!=="Sin dato"?" · "+esc(t):""}</button>`}).join(" ")}</div>`:""}`;}
+      <div class="balls">${ls.golesVito?BALL.repeat(Math.min(ls.golesVito,10))+` <b style="color:var(--fg)">${ls.golesVito} de Vito</b>`:"Vito no hizo goles"}${tp.length?" · "+tp.map(esc).join(", "):""}</div>${(ls.videos||[]).some(Boolean)?`<div>${(ls.videos||[]).map((v,i)=>{if(!v)return"";const t=(ls.tipos||[])[i];return `<button type="button" class="gt vd" style="font-size:13px;padding:6px 12px;margin-top:2px" data-vid="${esc(ls.id)}:${i}">▶ Ver gol${t&&t!=="Sin dato"?" · "+esc(t):""}</button>`}).join(" ")}</div>`:""}<div><button type="button" class="hbtn" data-placa="${esc(ls.id)}">Crear placa para compartir</button></div>`;}
 }
 
 /* ---------- Vito: ficha, gráficos y récords ---------- */
@@ -743,21 +919,26 @@ function partidoForm(p){
     <div class="err" id="pErr"></div>
     <div class="actions">
       ${n?"":`<button type="button" class="btn danger" id="pDel">Borrar</button>`}
-      <div class="r"><button type="button" class="btn" id="pCancel">Cancelar</button><button class="btn primary">Guardar</button></div></div>
+      <div class="r">${!n&&p.gf!=null&&p.gc!=null?`<button type="button" class="btn" id="pPlaca">Placa</button>`:""}<button type="button" class="btn" id="pCancel">Cancelar</button><button class="btn primary">Guardar</button></div></div>
   </div></form>`;
   $("#ov").hidden=false; $("#pCancel").onclick=close;
+  if($("#pPlaca"))$("#pPlaca").onclick=()=>placa(p.id);
   let first=p.tipos||[];
-  const orig=(p.videos||[]).map(v=>v&&v.path), vids=[...(p.videos||[])], files=[];
+  const orig=(p.videos||[]).map(v=>v&&v.path), vids=[...(p.videos||[])], files=[], poss=[...(p.pos||[])]; let openPos=-1;
   const drawTypes=()=>{const k=Math.min(10,Math.max(0,parseInt($("#pV").value)||0));const prev=[...document.querySelectorAll("#pTypes select")].map(x=>x.value);
     const src=prev.length?prev:first; first=[];
     $("#pTypes").innerHTML=Array.from({length:k},(_,i)=>`<div class="grow"><label>Gol ${i+1}<select id="pTy${i}">${TIPOS.map(t=>`<option${(src[i]||"Jugada")===t?" selected":""}>${t}</option>`).join("")}</select></label>
       <div class="vrow">${files[i]?`<span class="nm">🎬 ${esc(files[i].name)} · se sube al guardar</span><button type="button" class="linkbtn" data-vx="${i}">Quitar</button>`
         :vids[i]?`<span class="nm">🎬 Video cargado</span><button type="button" class="linkbtn" data-vx="${i}">Quitar</button>`
-        :`<label class="vpick">＋ Video del gol<input type="file" accept="video/*" data-vf="${i}" hidden></label>`}</div></div>`).join("")};
+        :`<label class="vpick">＋ Video del gol<input type="file" accept="video/*" data-vf="${i}" hidden></label>`}<button type="button" class="linkbtn" data-pt="${i}" style="margin-left:auto">${poss[i]?"Lugar marcado · cambiar":"Marcar desde dónde fue"}</button></div>
+      ${openPos===i?`<div style="max-width:280px">${pitch(poss[i]?dotS(poss[i]):"",`data-pp="${i}"`)}</div><span class="status" style="padding:0">Tocá la cancha donde pateó. El arco está arriba.</span>`:""}</div>`).join("")};
   $("#pTypes").addEventListener("change",e=>{const f=e.target.closest("[data-vf]");if(!f||!f.files[0])return;
     if(f.files[0].size>VMAX){$("#pErr").textContent="Ese video pesa más de 50 MB. Recortalo para que quede solo el gol.";f.value="";return}
     $("#pErr").textContent="";files[+f.dataset.vf]=f.files[0];drawTypes()});
-  $("#pTypes").addEventListener("click",e=>{const x=e.target.closest("[data-vx]");if(!x)return;files[+x.dataset.vx]=null;vids[+x.dataset.vx]=null;drawTypes()});
+  $("#pTypes").addEventListener("click",e=>{
+    const pt=e.target.closest("[data-pt]");if(pt){openPos=openPos===+pt.dataset.pt?-1:+pt.dataset.pt;drawTypes();return}
+    const sv=e.target.closest("svg[data-pp]");if(sv){const r=sv.getBoundingClientRect();poss[+sv.dataset.pp]={x:+((e.clientX-r.left)/r.width*100).toFixed(1),y:+((e.clientY-r.top)/r.height*70).toFixed(1)};drawTypes();return}
+    const x=e.target.closest("[data-vx]");if(!x)return;files[+x.dataset.vx]=null;vids[+x.dataset.vx]=null;drawTypes()});
   $("#pV").addEventListener("input",drawTypes); drawTypes();
   if(!n){let armed=false;$("#pDel").onclick=async()=>{
     if(!armed){armed=true;$("#pDel").textContent="¿Seguro? Tocá de nuevo";return}
@@ -789,6 +970,7 @@ function partidoForm(p){
     }catch(err){btn.disabled=false;btn.textContent="Guardar";$("#pErr").textContent="No se pudo subir el video ("+(err.message||err)+").";return}
     const vv=vids.slice(0,k).map(v=>v||null);
     if(vv.some(Boolean))body.videos=vv; else delete body.videos;
+    const pp=poss.slice(0,k).map(v=>v||null); if(pp.some(Boolean))body.pos=pp; else delete body.pos;
     const keep=new Set(vv.filter(Boolean).map(v=>v.path));
     try{
       if(n){ await db.doc("partidos/"+pid).set(body);
@@ -848,6 +1030,8 @@ async function delPartido(id,btn){
 
 document.addEventListener("click",e=>{
   const vd=e.target.closest("[data-vid]"); if(vd){e.stopPropagation();const [a,b]=vd.dataset.vid.split(/:(?=\d+$)/);playVideo(a,+b);return}
+  const pl=e.target.closest("[data-placa]"); if(pl){placa(pl.dataset.placa);return}
+  const rv=e.target.closest("[data-riv]"); if(rv){rivalView(rv.dataset.riv);return}
   const s=e.target.closest("[data-step]"); if(s){step(s.dataset.id,+s.dataset.step);return}
   const ed=e.target.closest("[data-edit]"); if(ed&&canWrite){torneoForm(torneos.find(t=>t.id===ed.dataset.edit));return}
   const ep=e.target.closest("[data-editp]"); if(ep){partidoForm(partidos.find(x=>x.id===ep.dataset.editp));return}
@@ -858,6 +1042,7 @@ document.addEventListener("click",e=>{
 $("#addT").onclick=()=>torneoForm();
 $("#addP").onclick=()=>partidoForm();
 $("#impBtn").onclick=()=>importForm();
+$("#seasonBtn").onclick=()=>seasonView();
 // Foto de la ficha: recorta un cuadrado centrado y la guarda chica dentro del perfil
 $("#fotoIn").onchange=async e=>{
   const f=e.target.files[0]; e.target.value=""; if(!f)return;

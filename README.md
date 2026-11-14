@@ -24,3 +24,4 @@ Abrir el link en **Safari** → botón **Compartir** → **Agregar a inicio**. A
 - `sw.js`: permite abrir la app sin señal y la deja instalable.
 - `.github/workflows/keepalive.yml`: lunes y jueves llama a `keepalive()` en Supabase para que el proyecto gratis no se pause. Si pasan 45 días sin commits, hace un commit de mantenimiento para que GitHub no desactive el workflow.
 - Videos de goles: bucket privado `videos` en Supabase Storage (`supabase/videos.sql`). Se suben desde el formulario del partido, uno por gol, y se ven desde el fixture, Inicio y la pestaña Vito.
+- Extras: logros, próximo objetivo, placa del partido para compartir (se dibuja en el teléfono), comparación mes a mes de las canilleras, mapa de goles (campo `pos` por gol), historial por rival y resumen de temporada.
