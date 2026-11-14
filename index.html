@@ -239,6 +239,35 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 .vpick{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--line);border-radius:8px;padding:7px 12px;color:var(--fg);font-weight:600;cursor:pointer}
 .player{background:#000;border-radius:12px;overflow:hidden}
 .player video{display:block;width:100%;max-height:70vh;background:#000}
+.heroB{border-radius:16px;margin-top:14px}
+.heroB .hero{padding:20px 18px 16px}
+.heroB .total .n{font-size:clamp(96px,30vw,132px)}
+.sbar{display:flex;gap:2px;height:12px;border-radius:6px;overflow:hidden;position:relative}
+.sbar i{display:block;height:100%}
+.sbar #sbM{background:var(--accent)} .sbar #sbH{flex:1;background:var(--chalk)}
+.tiles2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.tiles2:empty{display:none}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;display:grid;gap:2px;min-width:0}
+.tile .lab{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.tile b{font-family:var(--display);font-weight:800;font-size:36px;line-height:1}
+.tile .sub{font-size:12px;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.card h2{font-size:20px}
+.formrow{display:flex;gap:6px}
+.fcol{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.fcol .dots{height:52px;display:flex;flex-direction:column-reverse;align-items:center;gap:3px;font-size:12px;color:var(--muted)}
+.fcol .dots i{width:10px;height:10px;border-radius:50%;background:var(--accent);display:block}
+.fcol .r{width:26px;height:26px;border-radius:6px;color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+.fcol .r.w{background:#1f5a34} .fcol .r.l{background:#8a2a22} .fcol .r.d{background:#5d6a60}
+.fcol .rv{font-size:10px;color:var(--muted);text-align:center;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbars{display:grid;gap:8px}
+.hbar{display:grid;grid-template-columns:84px 1fr 18px;gap:10px;align-items:center;font-size:13px;font-weight:600}
+.hbar .tr{height:10px;border-radius:5px;background:var(--line)}
+.hbar .tr i{display:block;height:100%;border-radius:5px;background:var(--pitch)}
+@media (prefers-color-scheme:dark){.hbar .tr i{background:var(--martona)}}
+.hbar b{font-family:var(--display);font-size:17px;font-weight:800;text-align:right}
+.next{border-color:var(--accent)!important}
+.next .when{margin-left:auto;font-family:var(--display);font-weight:800;font-size:20px;line-height:1;text-align:right;text-transform:uppercase;flex:none}
 .settings{display:grid;gap:10px}
 .settings .who{font-size:13px;color:var(--muted)}
 .sync{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);right:12px;z-index:7;font-size:11px;font-weight:600;background:rgba(0,0,0,.35);color:#fff;border-radius:999px;padding:3px 9px}
@@ -258,24 +287,22 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 <div class="sync" id="sync" hidden></div>
 
 <div class="tab" id="tab-inicio">
-<header class="pitch">
-  <div class="lines" aria-hidden="true"></div>
-  <div class="wrap hero">
-    <div class="eyebrow">Vito Covetta · Goleador</div>
-    <div class="total"><div class="n" id="tTotal">–</div><div class="lbl">Goles<small id="tSub">en todos los torneos</small></div></div>
-    <div class="split">
-      <span class="chip"><span class="crest m" data-crest="La Martona" style="--cs:26px">LM</span>La Martona <b id="tM">–</b></span>
-      <span class="chip"><span class="crest h" data-crest="Huracán" style="--cs:26px">H</span>Huracán <b id="tH">–</b></span>
-    </div>
-  </div>
-  <div class="kpis wrap" style="padding-left:0;padding-right:0">
-    <div><b id="kT">–</b><span>Torneos</span></div>
-    <div><b id="kC">–</b><span>Títulos</span></div>
-    <div><b id="kP">–</b><span>Prom. x torneo</span></div>
-  </div>
-</header>
 <main class="wrap">
-  <section id="nextSec" hidden><div class="next" id="next"></div></section>
+  <section id="nextSec" hidden style="padding-block:14px 0"><div class="next" id="next"></div></section>
+  <header class="pitch heroB">
+    <div class="lines" aria-hidden="true"></div>
+    <div class="hero">
+      <div class="total"><div class="n" id="tTotal">–</div><div class="lbl">Goles<small id="tSub">en todos los torneos</small></div></div>
+      <div class="sbar" aria-hidden="true"><i id="sbM"></i><i id="sbH"></i></div>
+      <div class="split">
+        <span class="chip"><span class="crest m" data-crest="La Martona" style="--cs:26px">LM</span>La Martona <b id="tM">–</b></span>
+        <span class="chip"><span class="crest h" data-crest="Huracán" style="--cs:26px">H</span>Huracán <b id="tH">–</b></span>
+      </div>
+    </div>
+  </header>
+  <div class="tiles2" id="hTiles"></div>
+  <section id="formSec" hidden style="padding-block:12px 0"><div class="card"><h2>Últimos 5 partidos <small style="white-space:nowrap">punto = gol</small></h2><div class="formrow" id="form"></div></div></section>
+  <section id="howSec" hidden style="padding-block:12px 0"><div class="card"><h2>Cómo los hace</h2><div class="hbars" id="howBars"></div></div></section>
   <section id="lastSec" hidden><h2>Último partido</h2><div class="last" id="last"></div></section>
   <section id="nowSec" hidden>
     <h2>Dónde compite hoy <small id="nowAl"></small></h2>
@@ -406,7 +433,7 @@ const slug=c=>c==="Huracán"?"huracan":"la-martona";
 const ini=c=>c==="Huracán"?"H":"LM";
 function crestAny(club,size){if(club==="Huracán"||club==="La Martona")return crest(club,size);const ini2=club.split(/\s+/).filter(w=>w.length>2).map(w=>w[0]).join("").slice(0,2).toUpperCase();return `<span class="crest o" style="--cs:${size||28}px" title="${esc(club)}">${esc(ini2)}</span>`}
 let tray=[], ahora=null, fisCol=[], jugador=null, agenda=null, tab='inicio';
-const gapTxt=(d,u)=>d<=0?`<span class="gap lead">Puntero</span>`:`<span class="gap">a ${d} ${u}${d===1?"":"s"}</span>`;
+const gapTxt=(d,u)=>d<=0?`<span class="gap lead">Puntero</span>`:`<span class="gap">a ${d} ${u}${d===1?"":(u==="gol"?"es":"s")}</span>`;
 function crest(club,size){const l=clubes[slug(club)]?.logo;
   return `<span class="crest ${cls(club)}${l?" has":""}" style="--cs:${size||28}px" title="${esc(club)}">${l?`<img alt="${esc(club)}" src="${esc(l)}">`:ini(club)}</span>`}
 try{filtro=localStorage.getItem("vito-filtro")||"all"}catch(e){}
@@ -448,11 +475,7 @@ function doRender(){
   const m=torneos.filter(t=>t.club!=="Huracán").reduce((a,t)=>a+(t.goles||0),0);
   $("#tTotal").textContent=torneos.length?tot:"0";
   $("#tM").textContent=m; $("#tH").textContent=tot-m;
-  const oficiales=torneos.filter(t=>t.tipo!=="amistoso");
-  $("#kT").textContent=oficiales.length;
-  $("#kC").textContent=torneos.filter(t=>t.campeon).length+tray.reduce((a,L)=>a+(L.clubes||[]).reduce((b,c)=>b+(c.titulos||[]).length,0),0);
-  const go=oficiales.reduce((a,t)=>a+(t.goles||0),0);
-  $("#kP").textContent=oficiales.length?(go/oficiales.length).toFixed(1).replace(".",","):"–";
+  $("#sbM").style.width=(tot?Math.round(m/tot*100):50)+"%";
   $("#nowSec").hidden=!(ahora&&ahora.comps&&ahora.comps.length);
   if(ahora&&ahora.comps){$("#nowAl").textContent=ahora.actualizado?"al "+ahora.actualizado:"";
     $("#nowGrid").innerHTML=ahora.comps.map(c=>{const v=c.vito||{};const dT=(c.liderPts||0)-(c.pts||0);
@@ -540,7 +563,24 @@ function renderInicio(){
   const jug=p=>p.gf!=null&&p.gc!=null;
   const nx=partidos.filter(p=>!jug(p)&&p.fecha&&p.fecha>=hoy).sort((a,b)=>a.fecha.localeCompare(b.fecha))[0];
   $("#nextSec").hidden=!nx;
-  if(nx)$("#next").innerHTML=`${crest(nx.club,40)}<div style="min-width:0"><div class="k">Próximo partido</div><div style="font-family:var(--display);font-weight:700;font-size:22px;line-height:1.1">${nx.visitante?`${esc(nx.rival)} vs ${esc(nx.club)}`:`${esc(nx.club)} vs ${esc(nx.rival)}`}</div><div style="font-size:13px;color:var(--muted)">${fmtF(nx.fecha)} · ${nx.visitante?"Visitante":"Local"}${tn[nx.torneoId]?" · "+esc(tn[nx.torneoId]):""}</div></div>`;
+  if(nx)$("#next").innerHTML=`${crest(nx.club,36)}<div style="min-width:0"><div class="k" style="color:var(--muted)">Próximo${nx.fechaN?" · Fecha "+nx.fechaN:""}</div><div style="font-weight:600;font-size:15px">vs ${esc(nx.rival)} · ${nx.visitante?"de visitante":"de local"}</div><div style="font-size:12px;color:var(--muted)">${esc(nx.club)}${tn[nx.torneoId]?" · "+esc(tn[nx.torneoId]):""}</div></div><span class="when">${fmtF(nx.fecha).replace(" ","<br>")}</span>`;
+  // Tarjetas: puesto en goleadores y hat-tricks
+  const cg=(ahora&&ahora.comps||[]).find(c=>c.vito&&c.vito.pos);
+  const hat=partidos.filter(p=>(p.golesVito||0)>=3).length, olim=partidos.reduce((a,p)=>a+(p.tipos||[]).filter(t=>t==="Olímpico").length,0);
+  let tl="";
+  if(cg){const dv=(cg.vito.liderGoles||0)-(cg.vito.goles||0);tl+=`<div class="tile"><span class="lab">Goleador · ${esc((cg.torneo||"").split("·")[0].trim())}</span><b>${cg.vito.pos}°</b><span class="sub">${cg.vito.goles} goles · ${dv>0?"a "+dv+" del líder":"puntero"}</span></div>`}
+  tl+=`<div class="tile"><span class="lab">Hat-tricks</span><b>${hat}</b><span class="sub">${olim?olim+" gol"+(olim>1?"es olímpicos":" olímpico"):"3 o más goles en un partido"}</span></div>`;
+  $("#hTiles").innerHTML=torneos.length?tl:"";
+  // Racha: últimos 5 partidos jugados
+  const u5=partidos.filter(p=>jug(p)&&p.fecha&&p.jugo!==false).sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,5).reverse();
+  $("#formSec").hidden=u5.length<2;
+  $("#form").innerHTML=u5.map(p=>{const k=p.gf>p.gc?"w":p.gf<p.gc?"l":"d",g=p.golesVito||0;
+    return `<div class="fcol" title="${esc(p.club)} ${p.gf}-${p.gc} ${esc(p.rival)} · ${fmtF(p.fecha)}"><div class="dots">${g?"<i></i>".repeat(Math.min(g,5)):"–"}</div><span class="r ${k}">${k==="w"?"G":k==="l"?"P":"E"}</span><span class="rv">${esc(p.rival.replace(/\s*\(.*\)$/,""))}</span></div>`}).join("");
+  // Cómo hace los goles
+  const ct={};partidos.forEach(p=>(p.tipos||[]).forEach(t=>{if(t&&t!=="Sin dato")ct[t]=(ct[t]||0)+1}));
+  const ce=Object.entries(ct).sort((a,b)=>b[1]-a[1]).slice(0,5), cm=ce.length?ce[0][1]:1;
+  $("#howSec").hidden=!ce.length;
+  $("#howBars").innerHTML=ce.map(([t,n])=>`<div class="hbar"><span>${esc(t)}</span><div class="tr"><i style="width:${Math.round(n/cm*100)}%"></i></div><b>${n}</b></div>`).join("");
   const ls=partidos.filter(p=>jug(p)&&p.fecha).sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
   $("#lastSec").hidden=!ls;
   if(ls){const k=ls.gf>ls.gc?"Ganado":ls.gf<ls.gc?"Perdido":"Empate";
