@@ -186,17 +186,18 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 .next .k{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pitch)}
 @media (prefers-color-scheme:dark){.next{border-color:var(--accent)}.next .k{color:var(--accent)}}
 .cardwrap{display:flex;justify-content:center;padding:18px 0 6px;background:radial-gradient(120% 90% at 50% 0%,#1d6b3e 0%,#0e2c1b 70%);border-radius:16px;margin-top:14px}
-.shield{--sh:polygon(50% 0,100% 7%,100% 66%,50% 100%,0 66%,0 7%);width:min(300px,86%);aspect-ratio:300/420;max-width:100%;clip-path:var(--sh);background:linear-gradient(160deg,#f7d56a 0%,#e8b923 38%,#b88a12 100%);padding:4px;position:relative}
-.shield .in{clip-path:var(--sh);width:100%;height:100%;background:linear-gradient(175deg,#123d26 0%,#0b2617 100%);color:#f4f8f2;display:flex;flex-direction:column;align-items:center;padding:20px 22px 0;gap:6px}
-.shield .top{display:flex;width:100%;align-items:flex-start;justify-content:space-between}
-.shield .ovr{font-family:var(--display);font-weight:800;font-size:52px;line-height:.85;color:#f2c230}
-.shield .ovr small{display:block;font-size:13px;letter-spacing:.12em;color:#f4f8f2;opacity:.8;font-weight:700}
-.shield .num{font-family:var(--display);font-weight:800;font-size:22px;opacity:.9;text-align:right;line-height:1}
-.shield .ph{width:46%;aspect-ratio:1;border-radius:50%;object-fit:cover;border:3px solid #f2c230;margin-top:-28px;background:#0b2617}
+.shield{--sh:polygon(50% 0,100% 7%,100% 79%,50% 100%,0 79%,0 7%);width:min(300px,86%);aspect-ratio:300/480;max-width:100%;clip-path:var(--sh);background:linear-gradient(160deg,#f7d56a 0%,#e8b923 38%,#b88a12 100%);padding:4px;position:relative}
+.shield .in{clip-path:var(--sh);width:100%;height:100%;background:linear-gradient(175deg,#123d26 0%,#0b2617 100%);color:#f4f8f2;display:flex;flex-direction:column;align-items:center;padding:50px 26px 0;gap:7px}
+.shield .top{display:flex;width:100%;align-items:flex-start;justify-content:space-between;padding:0 2px}
+.shield .ovr{font-family:var(--display);font-weight:800;font-size:70px;line-height:.82;color:#f2c230;text-align:center}
+.shield .ovr small{display:block;margin-top:4px;font-size:14px;letter-spacing:.12em;color:#f4f8f2;opacity:.8;font-weight:700}
+.shield .num{font-family:var(--display);font-weight:800;font-size:70px;text-align:center;line-height:.82}
+.shield .num small{display:block;margin-top:4px;font-size:14px;letter-spacing:.12em;opacity:.8;font-weight:700}
+.shield .ph{width:58%;aspect-ratio:1;border-radius:50%;object-fit:cover;object-position:center;border:3px solid #f2c230;margin-top:-4px;background:#0b2617;display:block}
 .shield .nm{font-family:var(--display);font-weight:800;font-size:28px;text-transform:uppercase;letter-spacing:.04em;line-height:1;border-bottom:1px solid rgba(242,194,48,.5);padding-bottom:6px;width:80%;text-align:center}
-.shield .attrs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px;width:82%;font-size:13px}
-.shield .attrs div{display:flex;justify-content:space-between;align-items:baseline}
-.shield .attrs b{font-family:var(--display);font-weight:800;font-size:22px;color:#f2c230}
+.shield .attrs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px 6px;width:78%;font-size:10px;letter-spacing:.06em;text-transform:uppercase}
+.shield .attrs div{display:flex;flex-direction:column-reverse;align-items:center;gap:1px;opacity:.95}
+.shield .attrs b{font-family:var(--display);font-weight:800;font-size:26px;line-height:1;color:#f2c230;letter-spacing:0}
 .shield .clubs{display:flex;gap:8px;margin-top:4px}
 .shield .clubs img{width:26px;height:26px;border-radius:50%;background:#fff;object-fit:contain}
 .cardnote{font-size:12px;color:#cfe0d3;text-align:center;padding:10px 16px 14px}
@@ -325,6 +326,7 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
     <h2>Ajustes</h2>
     <div class="settings">
       <div class="who" id="whoAmI"></div>
+      <label class="btn" style="display:grid;place-items:center;color:var(--fg);font-size:15px;cursor:pointer">Cambiar foto de Vito<input type="file" accept="image/*" id="fotoIn" hidden></label>
       <div class="two"><button type="button" class="btn" id="impBtn">Importar datos</button><button type="button" class="btn" id="outBtn">Cerrar sesión</button></div>
       <div class="who" id="instHint"></div>
     </div>
@@ -632,7 +634,7 @@ function renderVito(){
   const lg=clubes["la-martona"]?.logo, hg=clubes["huracan"]?.logo;
   const nm=(jugador?.nombre||"Vito").split(" ")[0];
   $("#shield").innerHTML=`<div class="in">
-    <div class="top"><div class="ovr">${L.length?avg(L,"puntuacion"):"–"}<small>NOTA</small></div><div class="num">${jugador?.numero?"#"+jugador.numero:""}</div></div>
+    <div class="top"><div class="ovr">${L.length?avg(L,"puntuacion"):"–"}<small>NOTA</small></div><div class="num">${jugador?.numero?jugador.numero+"<small>CAMISETA</small>":""}</div></div>
     ${jugador?.foto?`<img class="ph" src="${esc(jugador.foto)}" alt="${esc(nm)}">`:`<div class="ph" style="display:grid;place-items:center;font-family:var(--display);font-size:40px;font-weight:800">${esc(nm[0]||"V")}</div>`}
     <div class="nm">${esc(nm)}</div>
     <div class="attrs">
@@ -856,6 +858,18 @@ document.addEventListener("click",e=>{
 $("#addT").onclick=()=>torneoForm();
 $("#addP").onclick=()=>partidoForm();
 $("#impBtn").onclick=()=>importForm();
+// Foto de la ficha: recorta un cuadrado centrado y la guarda chica dentro del perfil
+$("#fotoIn").onchange=async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f)return;
+  try{
+    const img=new Image(); const u=URL.createObjectURL(f);
+    await new Promise((ok,no)=>{img.onload=ok;img.onerror=no;img.src=u});
+    const s=Math.min(img.naturalWidth,img.naturalHeight), c=document.createElement("canvas"); c.width=c.height=360;
+    c.getContext("2d").drawImage(img,(img.naturalWidth-s)/2,(img.naturalHeight-s)/2,s,s,0,0,360,360); URL.revokeObjectURL(u);
+    await db.doc("perfil/jugador").set({nombre:"Vito Covetta",numero:10,...(jugador||{}),foto:c.toDataURL("image/jpeg",.82)});
+    $("#status").textContent="Foto actualizada."; window.scrollTo(0,0);
+  }catch(err){$("#status").textContent="No se pudo cargar esa foto. Probá con un JPG o PNG."}
+};
 $("#outBtn").onclick=async()=>{await sb.auth.signOut();location.reload()};
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&!$("#ov").hidden)close();const ep=e.target.closest&&e.target.closest(".fx[data-editp]");if(ep&&(e.key==="Enter"||e.key===" ")){e.preventDefault();ep.click()}});
 
