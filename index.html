@@ -275,6 +275,12 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 .fcol .r.w{background:#1f5a34} .fcol .r.l{background:#8a2a22} .fcol .r.d{background:#5d6a60}
 .fcol .rv{font-size:10px;color:var(--muted);text-align:center;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hbars{display:grid;gap:8px}
+.rvx{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}.rvx .card{display:grid;gap:8px}
+.rvx .ch{display:flex;align-items:center;gap:8px;font-weight:700}
+.rvx button{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;text-align:left;width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:9px 12px;cursor:pointer;color:var(--fg)}
+.rvx button i{grid-row:span 2;font-style:normal;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:4px 7px;border-radius:6px}
+.rvx .vi i{background:var(--martona);color:#fff}.rvx .ne i{background:var(--danger,#c0392b);color:#fff}
+.rvx button b{font-size:15px}.rvx button span{font-size:12px;color:var(--muted)}.rvx p{margin:0;font-size:13px;color:var(--muted)}
 .hbar{display:grid;grid-template-columns:84px 1fr 18px;gap:10px;align-items:center;font-size:13px;font-weight:600}
 .hbar .tr{height:10px;border-radius:5px;background:var(--line)}
 .hbar .tr i{display:block;height:100%;border-radius:5px;background:var(--pitch)}
@@ -403,6 +409,7 @@ body.ro #addP,body.ro #addT,body.ro #impBtn,body.ro .edonly,body.ro .step,body.r
   <section id="goalSec" hidden style="padding-block:12px 0"><div class="card"><h2>Próximo objetivo</h2><div class="goals" id="goals"></div></div></section>
   <section id="formSec" hidden style="padding-block:12px 0"><div class="card"><h2>Últimos 5 partidos <small style="white-space:nowrap">punto = gol</small></h2><div class="formrow" id="form"></div></div></section>
   <section id="howSec" hidden style="padding-block:12px 0"><div class="card"><h2>Cómo los hace</h2><div class="hbars" id="howBars"></div></div></section>
+  <section id="rvxSec" hidden style="padding-block:12px 0"><h2>Víctima y némesis <small>tocá para ver la ficha</small></h2><div class="rvx" id="rvx"></div></section>
   <section id="lastSec" hidden><h2>Último partido</h2><div class="last" id="last"></div></section>
   <section id="nowSec" hidden>
     <h2>Dónde compite hoy <small id="nowAl"></small></h2>
@@ -1137,6 +1144,18 @@ function renderInicio(){
   const ce=Object.entries(ct).sort((a,b)=>b[1]-a[1]).slice(0,5), cm=ce.length?ce[0][1]:1;
   $("#howSec").hidden=!ce.length;
   $("#howBars").innerHTML=ce.map(([t,n])=>`<div class="hbar"><span>${esc(t)}</span><div class="tr"><i style="width:${Math.round(n/cm*100)}%"></i></div><b>${n}</b></div>`).join("");
+  // Víctima favorita (más goles de Vito) y némesis (el que más le ganó) por club
+  const rvx=["La Martona","Huracán"].map(club=>{const R={};
+    partidos.filter(p=>p.club===club&&p.rival&&jug(p)&&p.jugo!==false).forEach(p=>{const k=rivKey(p.rival),r=R[k]=R[k]||{k,n:rivName(p.rival),m:0,g:0,w:0,l:0,gf:0,gc:0};
+      r.m++;r.g+=p.golesVito||0;r.gf+=p.gf;r.gc+=p.gc;if(p.gf>p.gc)r.w++;else if(p.gf<p.gc)r.l++});
+    const L=Object.values(R);if(!L.length)return"";
+    const vi=L.filter(r=>r.g>0).sort((a,b)=>b.g-a.g||a.m-b.m)[0];
+    const ne=L.filter(r=>r.l>0).sort((a,b)=>(b.l-b.w)-(a.l-a.w)||b.l-a.l||(b.gc-b.gf)-(a.gc-a.gf))[0];
+    const pm=n=>`${n} ${n===1?"partido":"partidos"}`;
+    return `<div class="card"><div class="ch">${crest(club,24)}${esc(club)}</div>
+      ${vi?`<button type="button" class="vi" data-riv="${esc(vi.k)}"><i>Víctima</i><b>${esc(vi.n)}</b><span>${vi.g} ${vi.g===1?"gol":"goles"} de Vito en ${pm(vi.m)}</span></button>`:`<p>Todavía no hizo goles con ${esc(club)}.</p>`}
+      ${ne?`<button type="button" class="ne" data-riv="${esc(ne.k)}"><i>Némesis</i><b>${esc(ne.n)}</b><span>${ne.l} ${ne.l===1?"derrota":"derrotas"}${ne.w?` y ${ne.w} ${ne.w===1?"victoria":"victorias"}`:""} en ${pm(ne.m)} · ${ne.g} ${ne.g===1?"gol":"goles"} de Vito</span></button>`:`<p>Ningún rival le ganó todavía.</p>`}</div>`}).filter(Boolean);
+  $("#rvxSec").hidden=!rvx.length;$("#rvx").innerHTML=rvx.join("");
   const ls=partidos.filter(p=>jug(p)&&p.fecha).sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
   $("#lastSec").hidden=!ls;
   if(ls){const k=ls.gf>ls.gc?"Ganado":ls.gf<ls.gc?"Perdido":"Empate";
