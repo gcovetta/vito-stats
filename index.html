@@ -275,6 +275,14 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 .fcol .r.w{background:#1f5a34} .fcol .r.l{background:#8a2a22} .fcol .r.d{background:#5d6a60}
 .fcol .rv{font-size:10px;color:var(--muted);text-align:center;line-height:1.15;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .hbars{display:grid;gap:8px}
+.vitrina{background:linear-gradient(180deg,#1b2a22,#0f1a14);border-radius:16px;padding:6px 12px 14px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.06),inset 0 30px 60px rgba(255,255,255,.04)}
+.shelf{margin-top:10px}.shelf>span{display:block;font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(244,248,242,.55);margin:6px 2px 2px}
+.shelf .row{display:flex;flex-wrap:wrap;align-items:flex-end;gap:4px 6px;padding:6px 4px 0;border-bottom:9px solid #8a5a2b;box-shadow:0 6px 8px -4px rgba(0,0,0,.6);border-radius:0 0 3px 3px;background:linear-gradient(180deg,transparent 70%,rgba(255,220,150,.06))}
+.troph{width:84px;display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:none;padding:4px 0 6px;cursor:pointer;color:#f4f8f2;text-align:center}
+.troph svg{width:58px;height:70px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.5));transition:transform .15s}.troph:hover svg,.troph:focus-visible svg{transform:translateY(-3px) scale(1.04)}
+.troph b{font-size:11px;line-height:1.15;max-width:84px;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}.troph small{font-size:10px;color:rgba(244,248,242,.6)}
+.troph.ph{opacity:.35;cursor:default}.troph.ph svg{filter:none}
+.vitinfo p{margin:4px 0;font-size:15px}.vitbig{display:grid;place-items:center;background:linear-gradient(180deg,#1b2a22,#0f1a14);border-radius:14px;padding:18px}.vitbig svg{width:140px;height:168px}
 .rvx{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}.rvx .card{display:grid;gap:8px}
 .rvx .ch{display:flex;align-items:center;gap:8px;font-weight:700}
 .rvx button{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center;text-align:left;width:100%;border:1px solid var(--line);border-radius:10px;background:var(--bg);padding:9px 12px;cursor:pointer;color:var(--fg)}
@@ -422,6 +430,7 @@ body.ro #addP,body.ro #addT,body.ro #impBtn,body.ro .edonly,body.ro .step,body.r
 <main class="wrap">
   <div class="cardwrap"><div style="width:100%;display:flex;flex-direction:column;align-items:center"><div class="shield" id="shield"><div class="in"></div></div><div class="cardnote" id="cardnote"></div></div></div>
   <div class="kgrid" id="kgrid"></div>
+  <section id="vitSec" hidden><h2>Vitrina <small id="vitN"></small></h2><div class="vitrina" id="vitrina"></div></section>
   <section><h2>Logros <small id="achN"></small></h2><div class="ach" id="ach"></div></section>
   <section id="agSec" hidden><h2>Su semana</h2><div class="sheet" id="agenda"></div></section>
   <section><h2>Evolución <small>canilleras INSAIT JOY</small></h2><div id="charts"><div class="empty">Cargando…</div></div></section>
@@ -749,6 +758,41 @@ function rivalView(k){
     <div class="actions"><div class="r"><button type="button" class="btn" id="rvClose">Cerrar</button></div></div></div></div>`;
   $("#ov").hidden=false; $("#rvClose").onclick=close;
 }
+/* ---------- Vitrina de trofeos ---------- */
+const MET={oro:["#fff1a8","#e8b923","#9a6e0a"],plata:["#ffffff","#c9d1d6","#7d878e"],bronce:["#ffd2a1","#c27c3e","#7a4416"]};
+const grad=(id,c)=>`<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${c[0]}"/><stop offset=".5" stop-color="${c[1]}"/><stop offset="1" stop-color="${c[2]}"/></linearGradient></defs>`;
+let vitSeq=0;
+function trophySVG(kind,metal){const id="vg"+(++vitSeq),c=MET[metal||"oro"],f=`url(#${id})`;
+  if(kind==="copa")return `<svg viewBox="0 0 60 72" aria-hidden="true">${grad(id,c)}<path d="M16 8h28v14c0 9-6 15-14 15s-14-6-14-15z" fill="${f}"/><path d="M16 12H8v4c0 6 4 10 10 10M44 12h8v4c0 6-4 10-10 10" fill="none" stroke="${f}" stroke-width="3.5" stroke-linecap="round"/><path d="M27 37h6v9h-6z" fill="${f}"/><path d="M20 46h20l2 6H18z" fill="${f}"/><rect x="14" y="52" width="32" height="12" rx="2" fill="#3a2614"/><rect x="19" y="55" width="22" height="6" rx="1" fill="${f}" opacity=".85"/><path d="M21 11c0 8 2 13 6 16" stroke="#fff" stroke-opacity=".55" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`;
+  if(kind==="botin")return `<svg viewBox="0 0 60 72" aria-hidden="true">${grad(id,c)}<path d="M12 18c0-3 2-5 5-5h9l2 15c8 1 16 3 22 7 3 2 3 7-1 8H14c-1 0-2-1-2-2z" fill="${f}"/><path d="M14 43h36" stroke="#000" stroke-opacity=".25" stroke-width="2"/><g fill="${f}"><rect x="16" y="43" width="4" height="4" rx="1"/><rect x="26" y="43" width="4" height="4" rx="1"/><rect x="38" y="43" width="4" height="4" rx="1"/></g><path d="M17 19h8M17 24h9M18 29h9" stroke="#000" stroke-opacity=".3" stroke-width="1.6"/><path d="M15 16c0 8 1 16 2 22" stroke="#fff" stroke-opacity=".5" stroke-width="2" fill="none"/><rect x="14" y="52" width="32" height="12" rx="2" fill="#3a2614"/><rect x="19" y="55" width="22" height="6" rx="1" fill="${f}" opacity=".85"/></svg>`;
+  return `<svg viewBox="0 0 60 72" aria-hidden="true"><circle cx="30" cy="30" r="19" fill="#f7f7f2"/><path d="M30 20l7 5-3 8h-8l-3-8z" fill="#1d1d1d"/><path d="M30 11v9M37 25l9-3M34 33l6 8M26 33l-6 8M23 25l-9-3" stroke="#1d1d1d" stroke-width="1.6"/><path d="M14 22l-2 9 4 6M46 22l2 9-4 6M24 47l6 2 6-2" stroke="#1d1d1d" stroke-width="1.4" fill="none"/><circle cx="30" cy="30" r="19" fill="none" stroke="#000" stroke-opacity=".15" stroke-width="1.5"/><path d="M19 22a13 13 0 0 1 9-7" stroke="#fff" stroke-width="3" stroke-linecap="round" fill="none"/><path d="M20 52h20l3 6H17z" fill="#c9a24a"/><rect x="14" y="58" width="32" height="8" rx="2" fill="#3a2614"/></svg>`}
+function vitItems(){
+  const T=[],B=[],P=[];
+  torneos.filter(t=>t.campeon).sort((a,b)=>String(b.temporada||"").localeCompare(String(a.temporada||""))).forEach(t=>T.push({id:"t:"+t.id,kind:"copa",metal:"oro",n:t.nombre,c:t.club,y:t.temporada||"",t}));
+  tray.forEach(L=>(L.clubes||[]).forEach(c=>(c.titulos||[]).forEach((x,i)=>T.push({id:"y:"+c.nombre+":"+i,kind:"copa",metal:"oro",n:x,c:c.nombre,y:""}))));
+  torneos.forEach(t=>{const m=String(t.goleo||"").match(/^\s*(\d)\s*°\s*goleador/i);if(m&&+m[1]<=3)B.push({id:"b:"+t.id,kind:"botin",metal:["oro","plata","bronce"][+m[1]-1],n:t.nombre,c:t.club,y:t.temporada||"",pos:+m[1],t})});
+  partidos.filter(p=>(p.golesVito||0)>=3&&p.gf!=null).sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")).forEach(p=>P.push({id:"p:"+p.id,kind:"pelota",n:"vs "+rivName(p.rival),c:p.club,y:p.fecha?fmtF(p.fecha):"",p}));
+  return {T,B,P}}
+function vitrina(){
+  const {T,B,P}=vitItems(),n=T.length+B.length+P.length;vitSeq=0;
+  $("#vitSec").hidden=!n;if(!n)return;
+  $("#vitN").textContent=`${T.length} ${T.length===1?"copa":"copas"} · ${B.length} ${B.length===1?"botín":"botines"} · ${P.length} ${P.length===1?"pelota":"pelotas"}`;
+  const it=x=>`<button type="button" class="troph" data-tro="${esc(x.id)}">${trophySVG(x.kind,x.metal)}<b>${esc(x.n)}</b><small>${esc([x.c,x.y].filter(Boolean).join(" · "))}</small></button>`;
+  const ph=t=>`<div class="troph ph" aria-hidden="true">${trophySVG("copa","plata")}<small>${t}</small></div>`;
+  $("#vitrina").innerHTML=
+    `<div class="shelf"><span>Títulos</span><div class="row">${T.map(it).join("")}${ph("La que viene")}</div></div>`+
+    (B.length?`<div class="shelf"><span>Botines de goleador</span><div class="row">${B.map(it).join("")}</div></div>`:"")+
+    (P.length?`<div class="shelf"><span>Pelotas de hat-trick</span><div class="row">${P.map(it).join("")}</div></div>`:"");
+}
+function trophyView(id){
+  const {T,B,P}=vitItems(),x=[...T,...B,...P].find(i=>i.id===id);if(!x)return;vitSeq=100;
+  const t=x.t,p=x.p;let info="";
+  if(x.kind==="copa")info=t?`<p><b>Campeón</b> con ${esc(t.club)}${t.temporada?" en "+esc(t.temporada):""}.</p><p>${t.goles||0} ${t.goles===1?"gol":"goles"} de Vito${t.partidos?` en ${t.partidos} partidos`:""}${t.goleo?` · ${esc(t.goleo)}`:""}.</p>`:`<p><b>Campeón</b> con ${esc(x.c)}.</p>`;
+  if(x.kind==="botin")info=`<p><b>Botín de ${x.metal}</b>: ${x.pos}° goleador de ${esc(t.nombre)}.</p><p>${t.goles||0} goles con ${esc(t.club)}.</p>`;
+  if(x.kind==="pelota")info=`<p><b>${p.golesVito} goles</b> ${esc(p.club)} ${p.gf}-${p.gc} ${esc(rivName(p.rival))}.</p><p>${p.fecha?fmtF(p.fecha)+" "+p.fecha.slice(0,4):""}. En el fútbol, el que hace un hat-trick se lleva la pelota.</p>`;
+  $("#ov").innerHTML=`<div class="form"><div class="wrap"><h3>${esc(x.kind==="pelota"?"Pelota del hat-trick":x.n)}</h3><div class="vitbig">${trophySVG(x.kind,x.metal)}</div><div class="vitinfo">${info}</div>
+    <div class="actions"><div class="r">${p?`<button type="button" class="btn" data-placa="${esc(p.id)}">Ver placa</button>`:""}<button type="button" class="btn primary" id="trX">Cerrar</button></div></div></div></div>`;
+  $("#ov").hidden=false;$("#trX").onclick=close}
 function seasonView(){
   const yrs=partidos.map(p=>(p.fecha||"").slice(0,4)).filter(Boolean).sort(); const Y=yrs.length?yrs[yrs.length-1]:String(new Date().getFullYear());
   const T=torneos.filter(t=>String(t.temporada||"")===Y), P=partidos.filter(p=>(p.fecha||"").startsWith(Y)&&p.gf!=null&&p.gc!=null&&p.jugo!==false);
@@ -1241,6 +1285,7 @@ function renderVito(){
     <div class="cp"><b>${esc(t&&t!=="Sin dato"?t:"Gol")}</b><span>vs ${esc(p.rival)}${p.fecha?" · "+fmtF(p.fecha):""}</span></div></button>`}).join("");
   const hat=partidos.filter(p=>(p.golesVito||0)>=3).length;
   const olim=partidos.reduce((a,p)=>a+(p.tipos||[]).filter(t=>t==="Olímpico").length,0);
+  vitrina();
   $("#kgrid").innerHTML=`<div><b>${tot}</b><span>goles</span></div><div><b>${titulos}</b><span>títulos</span></div><div><b>${partidos.reduce((a,p)=>a+(+p.asist||0),0)}</b><span>asistencias</span></div><div><b>${hat}</b><span>hat-tricks</span></div>`;
   $("#charts").innerHTML=L.length?`
     <div class="chart"><h3>Nota por partido</h3><p>Los puntos amarillos son partidos en los que hizo goles.</p>${lineChart(L,"puntuacion")}</div>
@@ -1620,6 +1665,7 @@ document.addEventListener("click",e=>{
   const pg=e.target.closest("[data-pg]"); if(pg){pG=pG===+pg.dataset.pg?0:+pg.dataset.pg;render();return}
   const pl=e.target.closest("[data-placa]"); if(pl){placa(pl.dataset.placa);return}
   const rv=e.target.closest("[data-riv]"); if(rv){rivalView(rv.dataset.riv);return}
+  const tro=e.target.closest("[data-tro]"); if(tro){trophyView(tro.dataset.tro);return}
   const s=e.target.closest("[data-step]"); if(s){step(s.dataset.id,+s.dataset.step);return}
   const ed=e.target.closest("[data-edit]"); if(ed&&canWrite){torneoForm(torneos.find(t=>t.id===ed.dataset.edit));return}
   const ep=e.target.closest("[data-editp]"); if(ep&&canWrite){partidoForm(partidos.find(x=>x.id===ep.dataset.editp));return}
