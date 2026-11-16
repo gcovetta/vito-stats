@@ -242,11 +242,17 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 .vcard .cp b{display:block;font-size:14px}
 .vcard .cp span{color:var(--muted);font-size:12px}
 .grow{display:grid;gap:6px;padding-bottom:8px;border-bottom:1px dashed var(--line)}
-.vrow{display:flex;gap:8px;align-items:center;font-size:13px;color:var(--muted);min-width:0}
+.vrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--muted);min-width:0}
 .vrow .nm{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;color:var(--fg)}
 .vpick{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--line);border-radius:8px;padding:7px 12px;color:var(--fg);font-weight:600;cursor:pointer}
 .player{background:#000;border-radius:12px;overflow:hidden}
 .player video{display:block;width:100%;max-height:70vh;background:#000}
+.player iframe{display:block;width:100%;aspect-ratio:16/9;border:0}.player iframe.sh{aspect-ratio:9/16;max-height:70vh;width:auto;margin:0 auto}
+.ytin{display:flex;gap:8px;width:100%}.ytin input{flex:1;min-width:0}.vfile{font-size:12px;color:var(--muted);text-decoration:underline;cursor:pointer}
+.rvlink{border:0;background:none;padding:0;font:inherit;color:inherit;text-decoration:underline dotted;text-underline-offset:3px;cursor:pointer}
+.rvh{display:flex;align-items:center;gap:12px}.rvh h3{margin:0}.rvnext{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px}
+.rvbars{display:flex;align-items:flex-end;gap:6px;height:110px;padding:4px 2px 0;overflow-x:auto}.rvbars div{flex:0 0 auto;width:34px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%;font-size:10px;color:var(--muted)}
+.rvbars i{display:block;width:22px;border-radius:5px 5px 2px 2px;min-height:3px}.rvbars b{font-size:12px;color:var(--fg)}
 .heroB{border-radius:16px;margin-top:14px}
 .heroB .hero{padding:20px 18px 16px}
 .heroB .total .n{font-size:clamp(96px,30vw,132px)}
@@ -564,6 +570,9 @@ async function playVideo(pid,i){
     <p class="status" style="margin:0">${p.fecha?fmtF(p.fecha)+" · ":""}${esc(p.club)}</p>
     <div class="actions"><div class="r"><button type="button" class="btn" id="plClose">Cerrar</button></div></div></div></div>`;
   $("#ov").hidden=false; $("#plClose").onclick=close;
+  if(v.yt){const st=v.start?`&start=${v.start}`:"";
+    $("#plBox").innerHTML=`<iframe class="${v.short?"sh":""}" src="https://www.youtube-nocookie.com/embed/${esc(v.yt)}?autoplay=1&playsinline=1&rel=0${st}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen title="Video del gol"></iframe>`;
+    $("#plBox").insertAdjacentHTML("afterend",`<a class="linkbtn" style="display:block;text-align:center;margin-top:6px" target="_blank" rel="noopener" href="https://youtu.be/${esc(v.yt)}${v.start?"?t="+v.start:""}">Abrir en YouTube</a>`);return}
   const {data,error}=await sb.storage.from(VB).createSignedUrl(v.path,3600);
   const box=$("#plBox"); if(!box)return;
   if(error||!data){box.innerHTML='<div class="empty" style="color:#fff">No se pudo abrir el video. Revisá la conexión.</div>';return}
@@ -580,6 +589,15 @@ function makeThumb(file){return new Promise(res=>{
   v.src=URL.createObjectURL(file); v.load();
 })}
 async function rmVideos(paths){paths=paths.filter(Boolean);if(paths.length){try{await sb.storage.from(VB).remove(paths)}catch(_){}}}
+// Videos en YouTube (no listados): solo se guarda el link, no ocupan lugar en Supabase
+function parseYT(s){s=String(s||"").trim();if(!s)return null;let u;try{u=new URL(/^https?:/i.test(s)?s:"https://"+s)}catch(_){return null}
+  const h=u.hostname.replace(/^(www|m|music)\./,"");let id=null;
+  if(h==="youtu.be")id=u.pathname.slice(1).split("/")[0];
+  else if(/^youtube(-nocookie)?\.com$/.test(h)){id=u.searchParams.get("v");if(!id){const m=u.pathname.match(/^\/(shorts|live|embed|v)\/([^/?#]+)/);if(m)id=m[2]}}
+  if(!id||!/^[\w-]{11}$/.test(id))return null;
+  const t=u.searchParams.get("t")||u.searchParams.get("start")||"";let st=0;
+  if(/^\d+s?$/.test(t))st=parseInt(t);else{const m=t.match(/^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s)?$/);if(m)st=(+m[1]||0)*3600+(+m[2]||0)*60+(+m[3]||0)}
+  const o={yt:id,thumb:`https://i.ytimg.com/vi/${id}/hqdefault.jpg`};if(st)o.start=st;if(/^\/shorts\//.test(u.pathname))o.short=true;return o}
 
 /* ---------- Logros, objetivos, mapa de goles, rivales, resumen y placa ---------- */
 const rivName=s=>String(s||"").replace(/\s*\(.*\)\s*$/,"").trim();
@@ -686,15 +704,40 @@ function renderExtras(){
   // Goleadores del equipo (según los partidos donde se cargaron los otros goles)
   const TG={};partidos.forEach(p=>{if(!(p.otros||[]).length)return;const G=TG[p.club]=TG[p.club]||{n:0,m:{}};G.n++;if(p.golesVito)G.m["Vito"]=(G.m["Vito"]||0)+p.golesVito;p.otros.forEach(o=>{const k=o.n.trim();G.m[k]=(G.m[k]||0)+o.g})});
   $("#teamG").innerHTML=Object.entries(TG).map(([club,G])=>`<section><h2><span class="t" style="gap:10px">${crest(club,26)}<span>Goleadores del equipo</span></span> <small>${G.n} ${G.n===1?"partido cargado":"partidos cargados"}</small></h2><div class="sheet">${Object.entries(G.m).sort((a,b)=>b[1]-a[1]).map(([n,g],i)=>`<div class="match" style="grid-template-columns:28px 1fr auto"><div class="d" style="min-width:0"><b style="font-size:18px">${i+1}</b></div><div class="who"><b${n==="Vito"?' style="color:var(--martona)"':""}>${esc(n)}</b></div><div class="score">${g}</div></div>`).join("")}</div></section>`).join("");
-  $("#rivals").innerHTML=RL.map(r=>{let w=0,d=0,l=0,g=0;r.l.forEach(p=>{g+=p.golesVito||0;if(p.gf!=null&&p.gc!=null){p.gf>p.gc?w++:p.gf<p.gc?l++:d++}});
-    return `<button type="button" class="rvrow" data-riv="${esc(r.k)}"><span><b>${esc(r.name)}</b><span>${r.l.length} ${r.l.length===1?"partido":"partidos"} · ${w} G · ${d} E · ${l} P</span></span><em>${g} ${g===1?"gol":"goles"}</em></button>`}).join("");
+  $("#rivals").innerHTML=RL.map(r=>{let w=0,d=0,l=0,g=0,n=0;r.l.forEach(p=>{if(p.gf!=null&&p.gc!=null&&p.jugo!==false){n++;g+=p.golesVito||0;p.gf>p.gc?w++:p.gf<p.gc?l++:d++}});
+    return `<button type="button" class="rvrow" data-riv="${esc(r.k)}">${crestAny(r.name,30)}<span style="flex:1"><b>${esc(r.name)}</b><span>${n?`${n} ${n===1?"partido":"partidos"} · ${w} G · ${d} E · ${l} P`:"Todavía no jugaron"}</span></span><em>${g} ${g===1?"gol":"goles"}</em></button>`}).join("");
 }
 function rivalView(k){
-  const L=partidos.filter(p=>p.rival&&rivKey(p.rival)===k).sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")); if(!L.length)return;
-  const tn=Object.fromEntries(torneos.map(t=>[t.id,t.nombre]));
-  $("#ov").innerHTML=`<div class="form"><div class="wrap"><h3>Contra ${esc(rivName(L[0].rival))}</h3>
-    <div class="sheet">${L.map(p=>{const j=p.gf!=null&&p.gc!=null;return `<div class="match"><div class="d" style="min-width:52px">${p.fecha?`<b style="font-size:18px">${p.fecha.slice(8)}/${p.fecha.slice(5,7)}</b>${p.fecha.slice(0,4)}`:"<b style=\"font-size:16px\">s/f</b>"}</div>
-      <div class="who"><div class="t">${crest(p.club,22)}<span><b>${esc(p.club)}</b> · ${p.visitante?"visitante":"local"}</span></div><div class="balls">${esc(tn[p.torneoId]||"")}</div><div class="balls">${p.golesVito?BALL.repeat(Math.min(p.golesVito,6))+" "+p.golesVito+" de Vito":"Sin goles de Vito"}${chips(p)}</div></div>
+  const A=partidos.filter(p=>p.rival&&rivKey(p.rival)===k).sort((a,b)=>(b.fecha||"").localeCompare(a.fecha||"")); if(!A.length)return;
+  const name=rivName(A[0].rival), tn=Object.fromEntries(torneos.map(t=>[t.id,t.nombre]));
+  const hoy=new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+  const J=A.filter(p=>p.gf!=null&&p.gc!=null&&p.jugo!==false);
+  const prox=A.filter(p=>p.gf==null&&p.fecha&&p.fecha>=hoy).sort((a,b)=>a.fecha.localeCompare(b.fecha))[0];
+  let w=0,d=0,l=0,gf=0,gc=0,gv=0;J.forEach(p=>{gf+=p.gf;gc+=p.gc;gv+=p.golesVito||0;p.gf>p.gc?w++:p.gf<p.gc?l++:d++});
+  const best=J.reduce((b,p)=>(p.golesVito||0)>(b?.golesVito||0)?p:b,null), ult=J[0];
+  const res=p=>p.gf>p.gc?"G":p.gf<p.gc?"P":"E", RC={G:"var(--martona)",E:"#e8b923",P:"var(--danger,#c0392b)"};
+  const ct={};J.forEach(p=>(p.tipos||[]).forEach(t=>{if(t&&t!=="Sin dato")ct[t]=(ct[t]||0)+1}));
+  const V=[];J.forEach(p=>(p.videos||[]).forEach((v,i)=>{if(v)V.push({p,i})}));
+  const tile=(a,b,c)=>`<div><span>${a}</span><b>${b}</b><span>${c||""}</span></div>`;
+  const C=[...J].reverse(), mx=Math.max(1,...C.map(p=>p.golesVito||0));
+  const lab=x=>`<div class="lab" style="font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">${x}</div>`;
+  $("#ov").innerHTML=`<div class="form"><div class="wrap">
+    <div class="rvh">${crestAny(name,44)}<div><h3>${esc(name)}</h3><span class="status" style="padding:0">${J.length} ${J.length===1?"partido jugado":"partidos jugados"} en contra</span></div></div>
+    ${prox?`<div class="rvnext"><b>Próximo:</b> ${fmtF(prox.fecha)}${prox.hora?" · "+esc(prox.hora)+" hs":""} · ${esc(prox.club)} · ${prox.visitante?"de visitante":"de local"}</div>`:""}
+    ${J.length?`<div class="recs">
+      ${tile("Resultados",`<span style="font-size:.8em;white-space:nowrap">${w}G · ${d}E · ${l}P</span>`,J.length?`${Math.round(w/J.length*100)}% ganados`:"")}
+      ${tile("Goles de Vito",gv,`${(gv/J.length).toFixed(1).replace(".",",")} por partido`)}
+      ${tile("Goles del equipo",`${gf} – ${gc}`,"a favor – en contra")}
+      ${best&&best.golesVito?tile("Mejor partido",`${best.golesVito} ${best.golesVito===1?"gol":"goles"}`,`${fmtF(best.fecha)} · ${best.gf}-${best.gc}`):tile("Mejor partido","—","todavía sin goles")}
+      ${ult?tile("Último partido",`${ult.gf}-${ult.gc} ${{G:"ganó",E:"empató",P:"perdió"}[res(ult)]}`,fmtF(ult.fecha)):""}
+      ${Object.keys(ct).length?tile("Cómo le hace goles",esc(Object.entries(ct).sort((a,b)=>b[1]-a[1])[0][0]),Object.entries(ct).sort((a,b)=>b[1]-a[1]).map(([t,n])=>`${esc(t)} ${n}`).join(" · ")):""}
+    </div>
+    ${C.length>1?`<div class="chart" style="margin:0"><h3>Goles de Vito en cada partido</h3><p>El color es el resultado: verde ganó, amarillo empató, rojo perdió.</p><div class="rvbars">${C.map(p=>`<div title="${esc(fmtF(p.fecha))} · ${p.gf}-${p.gc}"><b>${p.golesVito||0}</b><i style="height:${Math.max(3,Math.round((p.golesVito||0)/mx*70))}px;background:${RC[res(p)]}"></i><span>${p.fecha?p.fecha.slice(8)+"/"+p.fecha.slice(5,7):"s/f"}</span></div>`).join("")}</div></div>`:""}
+    ${V.length?`<div>${lab("Goles en video")}${V.map(({p,i})=>{const t=(p.tipos||[])[i];return `<button type="button" class="gt vd" style="font-size:13px;padding:6px 12px;margin:0 6px 6px 0" data-vid="${esc(p.id)}:${i}">▶ ${esc(t&&t!=="Sin dato"?t:"Gol")} · ${fmtF(p.fecha)}</button>`}).join("")}</div>`:""}`
+    :`<p class="status">Todavía no jugaron contra ${esc(name)}.</p>`}
+    ${lab("Partidos")}
+    <div class="sheet">${A.map(p=>{const j=p.gf!=null&&p.gc!=null;return `<div class="match"><div class="d" style="min-width:52px">${p.fecha?`<b style="font-size:18px">${p.fecha.slice(8)}/${p.fecha.slice(5,7)}</b>${p.fecha.slice(0,4)}`:"<b style=\"font-size:16px\">s/f</b>"}</div>
+      <div class="who"><div class="t">${crest(p.club,22)}<span><b>${esc(p.club)}</b> · ${p.visitante?"visitante":"local"}</span></div><div class="balls">${esc(tn[p.torneoId]||"")}</div><div class="balls">${j?(p.golesVito?BALL.repeat(Math.min(p.golesVito,6))+" "+p.golesVito+" de Vito":"Sin goles de Vito"):"Próximo partido"}${chips(p)}</div></div>
       <div class="score">${j?p.gf+"–"+p.gc:"–"}</div></div>`}).join("")}</div>
     <div class="actions"><div class="r"><button type="button" class="btn" id="rvClose">Cerrar</button></div></div></div></div>`;
   $("#ov").hidden=false; $("#rvClose").onclick=close;
@@ -1027,7 +1070,7 @@ function doRender(){
     const [y,mo,d]=(p.fecha||"").split("-");
     return `<div class="match" ${canWrite?`data-editp="${esc(p.id)}" style="cursor:pointer"`:""}>
       <div class="d">${p.fecha?`<b>${+d}</b>${MES[+mo-1]||""} ${y.slice(2)}`:`<b style="font-size:16px">s/f</b>${p.fechaN?"F"+p.fechaN:""}`}</div>
-      <div class="who"><div class="t">${crest(p.club,22)}<span><b>${esc(p.club)}</b> vs ${esc(p.rival)}${p.visitante?' <small style="color:var(--muted)">(visitante)</small>':""}</span></div>
+      <div class="who"><div class="t">${crest(p.club,22)}<span><b>${esc(p.club)}</b> vs <button type="button" class="rvlink" data-riv="${esc(rivKey(p.rival))}">${esc(p.rival)}</button>${p.visitante?' <small style="color:var(--muted)">(visitante)</small>':""}</span></div>
         ${pend(p)?`<div class="balls">Próximo partido${tn[p.torneoId]?` · ${esc(tn[p.torneoId])}`:""}</div>`:`<div class="balls">${BALL.repeat(Math.min(p.golesVito||0,10))} ${p.golesVito==null?"Sin cargar goles":(p.golesVito||0)+" de Vito"}${p.fechaN&&p.fecha?" · F"+p.fechaN:""}${tn[p.torneoId]?` · ${esc(tn[p.torneoId])}`:""}${(p.golesVito||0)>0?` · <b style="color:${nvid(p)>=p.golesVito?"var(--martona)":"var(--muted)"}">${nvid(p)}/${p.golesVito} videos</b>`:""}</div>`}${chips(p)?`<div style="margin-top:4px">${chips(p)}</div>`:""}${extrasH(p)}</div>
       <div style="text-align:right">${pend(p)?`<span class="tag cup">Próximo</span>`:`<div class="score">${p.gf??"–"}–${p.gc??"–"}</div>`}${canWrite?`<button class="linkbtn" type="button" data-editp="${esc(p.id)}">Editar</button>`:""}</div>
     </div>`}).join(""):`<div class="empty">${partidos.length?"Ningún partido coincide con ese filtro.":"Todavía no hay partidos. Cargá uno con “+ Partido”."}</div>`;
@@ -1285,13 +1328,14 @@ function partidoForm(p){
   const drawStars=()=>{$("#pS").innerHTML=[1,2,3,4,5].map(i=>`<button type="button" data-st="${i}" class="${i<=st?"on":""}" aria-label="${i} ${i===1?"estrella":"estrellas"}" aria-pressed="${i<=st}"><svg viewBox="0 0 24 24" aria-hidden="true">${STAR}</svg></button>`).join("")};
   $("#pS").addEventListener("click",e=>{const b=e.target.closest("[data-st]");if(!b)return;st=st===+b.dataset.st?0:+b.dataset.st;drawStars()}); drawStars();
   let first=p.tipos||[];
-  const orig=(p.videos||[]).map(v=>v&&v.path), vids=[...(p.videos||[])], files=[], poss=[...(p.pos||[])]; let openPos=-1;
+  const orig=(p.videos||[]).map(v=>v&&v.path), vids=[...(p.videos||[])], files=[], poss=[...(p.pos||[])]; let openPos=-1, ytOpen=-1;
   const drawTypes=()=>{const k=Math.min(10,Math.max(0,parseInt($("#pV").value)||0));const prev=[...document.querySelectorAll("#pTypes select")].map(x=>x.value);
     const src=prev.length?prev:first; first=[];
     $("#pTypes").innerHTML=Array.from({length:k},(_,i)=>`<div class="grow"><label>Gol ${i+1}<select id="pTy${i}">${TIPOS.map(t=>`<option${(src[i]||"Jugada")===t?" selected":""}>${t}</option>`).join("")}</select></label>
       <div class="vrow">${files[i]?`<span class="nm">🎬 ${esc(files[i].name)} · se sube al guardar</span><button type="button" class="linkbtn" data-vx="${i}">Quitar</button>`
-        :vids[i]?`<span class="nm">🎬 Video cargado</span><button type="button" class="linkbtn" data-vx="${i}">Quitar</button>`
-        :`<label class="vpick">＋ Video del gol<input type="file" accept="video/*" data-vf="${i}" hidden></label>`}<button type="button" class="linkbtn" data-pt="${i}" style="margin-left:auto">${poss[i]?"Lugar marcado · cambiar":"Marcar desde dónde fue"}</button></div>
+        :vids[i]?`<span class="nm">${vids[i].yt?"▶ Video en YouTube":"🎬 Video cargado"}</span><button type="button" class="linkbtn" data-vx="${i}">Quitar</button>`
+        :ytOpen===i?`<span class="ytin"><input type="url" id="ytI${i}" inputmode="url" placeholder="Pegá el link de YouTube"><button type="button" class="btn" data-ytok="${i}">Listo</button></span>`
+        :`<button type="button" class="vpick" data-yt="${i}">＋ Link de YouTube</button><label class="vfile">o subir archivo<input type="file" accept="video/*" data-vf="${i}" hidden></label>`}<button type="button" class="linkbtn" data-pt="${i}" style="margin-left:auto">${poss[i]?"Lugar marcado · cambiar":"Marcar desde dónde fue"}</button></div>
       ${openPos===i?`<div style="max-width:280px">${pitch(poss[i]?dotS(poss[i]):"",`data-pp="${i}"`)}</div><span class="status" style="padding:0">Tocá la cancha donde pateó. El arco está arriba.</span>`:""}</div>`).join("")};
   $("#pTypes").addEventListener("change",e=>{const f=e.target.closest("[data-vf]");if(!f||!f.files[0])return;
     if(f.files[0].size>VMAX){$("#pErr").textContent="Ese video pesa más de 50 MB. Recortalo para que quede solo el gol.";f.value="";return}
@@ -1299,7 +1343,15 @@ function partidoForm(p){
   $("#pTypes").addEventListener("click",e=>{
     const pt=e.target.closest("[data-pt]");if(pt){openPos=openPos===+pt.dataset.pt?-1:+pt.dataset.pt;drawTypes();return}
     const sv=e.target.closest("svg[data-pp]");if(sv){const r=sv.getBoundingClientRect();poss[+sv.dataset.pp]={x:+((e.clientX-r.left)/r.width*100).toFixed(1),y:+((e.clientY-r.top)/r.height*70).toFixed(1)};drawTypes();return}
+    const yb=e.target.closest("[data-yt]");if(yb){ytOpen=+yb.dataset.yt;drawTypes();const inp=$("#ytI"+ytOpen);if(inp)inp.focus();return}
+    const yo=e.target.closest("[data-ytok]");if(yo){ytApply();return}
     const x=e.target.closest("[data-vx]");if(!x)return;files[+x.dataset.vx]=null;vids[+x.dataset.vx]=null;drawTypes()});
+  // Aplica el link de YouTube que se está escribiendo; devuelve false si no es un link válido
+  const ytApply=()=>{if(ytOpen<0)return true;const inp=$("#ytI"+ytOpen),val=inp?inp.value.trim():"";
+    if(!val){ytOpen=-1;drawTypes();return true}
+    const o=parseYT(val);if(!o){$("#pErr").textContent="Ese link no parece de YouTube. Copialo desde Compartir → Copiar enlace.";return false}
+    $("#pErr").textContent="";vids[ytOpen]=o;files[ytOpen]=null;ytOpen=-1;drawTypes();return true};
+  $("#pTypes").addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target.id&&e.target.id.startsWith("ytI")){e.preventDefault();ytApply()}});
   $("#pV").addEventListener("input",drawTypes); drawTypes();
   if(!n){let armed=false;$("#pDel").onclick=async()=>{
     if(!armed){armed=true;$("#pDel").textContent="¿Seguro? Tocá de nuevo";return}
@@ -1309,6 +1361,7 @@ function partidoForm(p){
       close()}catch(e){$("#pErr").textContent="No se pudo borrar."}}}
   $("#fP").onsubmit=async e=>{
     e.preventDefault();
+    if(!ytApply())return;
     const t=torneos.find(x=>x.id===$("#pT").value);
     const num=x=>x===""?null:Math.max(0,parseInt(x)||0);
     // Conserva campos extra del partido (canilleras, minutos, etc.)
