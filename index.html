@@ -149,6 +149,13 @@ label{display:grid;gap:4px;font-size:13px;color:var(--muted);font-weight:500}
 input,select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-size:16px;color:var(--fg);width:100%;min-width:0}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .three{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.cgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.cgrid label{font-size:12px}
+.cgrid input{padding:8px 10px}
+.cgrid input.miss{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--bg))}
+.csec{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.shot{display:flex;align-items:center;justify-content:center;gap:8px;height:52px;border:2px dashed var(--line);border-radius:12px;font-weight:600;cursor:pointer}
+.shot input{display:none}
 .checks{display:flex;gap:16px;flex-wrap:wrap}
 .checks label{display:flex;align-items:center;gap:8px;color:var(--fg);font-size:15px}
 .checks input{width:20px;height:20px}
@@ -1004,10 +1011,11 @@ function partidoForm(p){
     <div class="err" id="pErr"></div>
     <div class="actions">
       ${n?"":`<button type="button" class="btn danger" id="pDel">Borrar</button>`}
-      <div class="r">${!n&&p.gf!=null&&p.gc!=null?`<button type="button" class="btn" id="pPlaca">Placa</button>`:""}<button type="button" class="btn" id="pCancel">Cancelar</button><button class="btn primary">Guardar</button></div></div>
+      <div class="r">${!n?`<button type="button" class="btn" id="pCan">Canilleras</button>`:""}${!n&&p.gf!=null&&p.gc!=null?`<button type="button" class="btn" id="pPlaca">Placa</button>`:""}<button type="button" class="btn" id="pCancel">Cancelar</button><button class="btn primary">Guardar</button></div></div>
   </div></form>`;
   $("#ov").hidden=false; $("#pCancel").onclick=close;
   if($("#pPlaca"))$("#pPlaca").onclick=()=>placa(p.id);
+  if($("#pCan"))$("#pCan").onclick=()=>canilleraForm(partidos.find(x=>x.id===p.id)||p);
   let st=+p.estrellas||0;
   const drawStars=()=>{$("#pS").innerHTML=[1,2,3,4,5].map(i=>`<button type="button" data-st="${i}" class="${i<=st?"on":""}" aria-label="${i} ${i===1?"estrella":"estrellas"}" aria-pressed="${i<=st}"><svg viewBox="0 0 24 24" aria-hidden="true">${STAR}</svg></button>`).join("")};
   $("#pS").addEventListener("click",e=>{const b=e.target.closest("[data-st]");if(!b)return;st=st===+b.dataset.st?0:+b.dataset.st;drawStars()}); drawStars();
@@ -1078,6 +1086,156 @@ function partidoForm(p){
       close();
     }catch(err){btn.disabled=false;btn.textContent="Guardar";$("#pErr").textContent="No se pudo guardar. Probá de nuevo."}
   };
+}
+
+
+/* ---------- Canilleras INSAIT JOY: leer la captura del informe ---------- */
+// Lee el texto (OCR) de un informe de INSAIT JOY y devuelve los valores.
+function parseInsait(text){
+  const norm=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+  const L=text.split(/\n+/).map(s=>s.trim()).filter(Boolean);
+  const N=L.map(norm);
+  const nums=s=>(s.replace(/,/g,".").match(/\d+(?:\.\d+)?/g)||[]).map(Number);
+  const find=(re,from=0)=>{for(let i=from;i<N.length;i++)if(re.test(N[i]))return i;return -1};
+  // primera línea con números después de la etiqueta (la misma línea si ya trae números después del texto)
+  // números de la línea siguiente a la etiqueta; corta si aparece otra etiqueta (texto sin números)
+  const after=(i,min=1)=>{if(i<0)return null;for(let j=i+1;j<Math.min(N.length,i+4);j++){const v=nums(L[j]);
+    if(v.length>=min&&!v.every(x=>x===0))return v; if(!v.length&&/[a-z]{4,}/.test(N[j]))return null}return null};
+  const r={};
+  // Encabezado
+  let i=find(/tiempo jugado/);
+  if(i>=0){const seg=L[i].replace(/20\d\d\s*[-–—].*$/,"");const m=seg.match(/(\d{1,3})\s*['’′\/]\s*(\d{1,2})/)||seg.match(/(\d{1,3})(\d\d)\s*["”]/);
+    if(m)r.tiempo=`${m[1]}'${m[2].padStart(2,"0")}''`;
+    const d=L[i].match(/(20\d\d)\s*[-–—]\s*(\d\d)\s*[-–—]\s*(\d\d)/),h=L[i].match(/(\d{1,2}:\d\d)\s*$/);
+    if(d)r.fecha_hora=`${d[1]}-${d[2]}-${d[3]}${h?" "+h[1]:""}`}
+  if(!r.fecha_hora){const all=text.match(/(20\d\d)\s*[-–—]\s*(\d\d)\s*[-–—]\s*(\d\d)[^\n]*?(\d{1,2}:\d\d)?/);if(all)r.fecha_hora=`${all[1]}-${all[2]}-${all[3]}${all[4]?" "+all[4]:""}`}
+  r.tipo=/\btra[il1]n\b/i.test(text)&&!/\bmatch\b/i.test(text)?"Train":"Match";
+  i=find(/puntuaci/);
+  if(i>=0){const pre=N[i].split("venciendo")[0];const pn=nums(pre).filter(x=>x<=100);if(pn.length)r.puntuacion=pn[pn.length-1];
+    const g=L[i].match(/puntuaci\S*\s*([ABCDS])\s*(\+)?/i);if(g)r.nota=g[1].toUpperCase()+(g[2]||"");
+    const v=L[i].match(/(\d{1,3})\s*%/);if(v)r.vence_pct=+v[1]}
+  if(r.vence_pct>100)r.vence_pct=+String(r.vence_pct).slice(0,2);
+  if(r.vence_pct==null){const v=text.match(/venciendo al\s*(\d{1,3})\s*%/i);if(v)r.vence_pct=+v[1]}
+  if(r.puntuacion!=null&&!r.nota){const s=r.puntuacion;r.nota=s>=75?"A":s>=65?"B+":s>=55?"B":s>=40?"C+":"C"}
+  // Rubros (fila de 5 etiquetas)
+  i=find(/aguante.*speed|speed.*explosividad|equilibrio.*fuerza/);
+  let v=after(i,5); if(v)[r.aguante,r.speed,r.explosividad,r.equilibrio,r.fuerza]=v.slice(0,5);
+  i=find(/distancia por minuto/); v=after(i,3); if(v)[r.dist_por_min_m,r.sprint_prom_m,r.calorias]=v.slice(0,3);
+  i=find(/distancia recorrida/); v=after(i); if(v)r.distancia_m=v[0];
+  i=find(/alta velocidad/); v=after(i); if(v)r.dist_alta_vel_m=v[0];
+  i=find(/distancia de pique/); v=after(i); if(v)r.dist_pique_m=v[0];
+  i=find(/high.?speed runs|velocidad maxima/); v=after(i,2); if(v){r.carreras_alta_vel=v[0];r.vel_max_kmh=v[1]}
+  i=find(/^piques\b/); v=after(i); if(v)r.piques=v[0];
+  i=find(/mayor aceleracion|sharp turns|salto mas alto/);
+  if(i>=0)for(let j=i+1;j<Math.min(N.length,i+4);j++){const t=L[j].replace(/,/g,".");if(!/\d/.test(t))continue;
+    const ac=t.match(/(\d+(?:\.\d+)?)\s*m\s*\/?\s*s/i)||t.match(/^\D*(\d\.\d)/);if(ac)r.aceleracion_max=+ac[1];
+    const gs=t.match(/(\d{1,3})\s*[\/|l]\s*(\d{1,2})/);if(gs){r.giros=+gs[1];r.saltos=+gs[2]}
+    const sc=t.match(/(\d{1,3})\s*c\s*m/i);if(sc)r.salto_max_cm=+sc[1];break}
+  i=find(/uso del pie/);
+  if(i>=0)for(let j=i+1;j<Math.min(N.length,i+4);j++){if(!/%/.test(L[j]))continue;const pv=nums(L[j]).map(x=>x>100?+String(x).slice(0,2):x);
+    if(pv.length>=2){r.pie_izq_pct=pv[0];r.pie_der_pct=pv[1]}else if(pv.length===1){r.pie_izq_pct=pv[0]}break}
+  i=find(/ball touches/); v=after(i,2); if(v){r.toques_izq=v[0];r.toques_der=v[1]}
+  i=find(/kicking power/); v=after(i); if(v)r.patada_max_kg=v[0];
+  // Correcciones simples
+  if(r.pie_izq_pct!=null&&(r.pie_der_pct==null||r.pie_izq_pct+r.pie_der_pct!==100))r.pie_der_pct=100-r.pie_izq_pct;
+  if(r.dist_por_min_m!=null&&r.dist_por_min_m<5){delete r.dist_por_min_m;delete r.sprint_prom_m;delete r.calorias}
+  if(r.distancia_m!=null&&r.dist_alta_vel_m!=null&&r.distancia_m<r.dist_alta_vel_m)delete r.distancia_m;
+  if(r.vel_max_kmh>60)r.vel_max_kmh=r.vel_max_kmh/10;
+  if(r.aceleracion_max>9)r.aceleracion_max=r.aceleracion_max/10;
+  return r;
+}
+
+const CF=[["Puntuación",[["puntuacion","Nota /100"],["nota","Letra"],["vence_pct","Vence al %"]]],
+ ["Rubros",[["aguante","Aguante"],["speed","Velocidad"],["explosividad","Explosividad"],["equilibrio","Equilibrio"],["fuerza","Fuerza"]]],
+ ["Aguante",[["distancia_m","Distancia (m)"],["dist_alta_vel_m","Alta velocidad (m)"],["dist_pique_m","Pique (m)"],["sprint_prom_m","Sprint prom. (m)"],["calorias","Calorías"]]],
+ ["Velocidad",[["vel_max_kmh","Vel. máx (km/h)"],["carreras_alta_vel","Carreras rápidas"],["piques","Piques"]]],
+ ["Explosividad",[["aceleracion_max","Aceleración (m/s²)"],["giros","Giros"],["saltos","Saltos"],["salto_max_cm","Salto máx (cm)"]]],
+ ["Pies",[["pie_izq_pct","Izquierdo %"],["pie_der_pct","Derecho %"],["toques_izq","Toques izq."],["toques_der","Toques der."]]],
+ ["Fuerza",[["patada_max_kg","Patada máx (kg)"]]]];
+const RANGO={puntuacion:[1,100],vence_pct:[0,100],aguante:[0,100],speed:[0,100],explosividad:[0,100],equilibrio:[0,100],fuerza:[0,100],
+  dist_por_min_m:[5,200],sprint_prom_m:[3,60],calorias:[10,900],distancia_m:[100,15000],dist_alta_vel_m:[0,6000],dist_pique_m:[0,2000],
+  carreras_alta_vel:[0,250],vel_max_kmh:[5,40],piques:[0,80],aceleracion_max:[0.5,8],giros:[0,300],saltos:[0,60],salto_max_cm:[3,80],
+  pie_izq_pct:[0,100],pie_der_pct:[0,100],toques_izq:[0,400],toques_der:[0,400],patada_max_kg:[10,260]};
+let tessP=null;
+function loadTess(){return tessP||(tessP=new Promise((ok,ko)=>{if(window.Tesseract)return ok(window.Tesseract);
+  const sc=document.createElement("script");sc.src="https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js";
+  sc.onload=()=>ok(window.Tesseract);sc.onerror=()=>{tessP=null;ko(new Error("No se pudo cargar el lector. Revisá la conexión."))};document.head.appendChild(sc)}))}
+async function prepImg(bmp,mode){let k=2;const mx=Math.max(bmp.width,bmp.height);if(mx*k>7000)k=7000/mx;k=Math.min(k,Math.sqrt(12e6/(bmp.width*bmp.height)));
+  const c=document.createElement("canvas");c.width=Math.round(bmp.width*k);c.height=Math.round(bmp.height*k);
+  const x=c.getContext("2d");x.imageSmoothingQuality="high";x.drawImage(bmp,0,0,c.width,c.height);
+  const im=x.getImageData(0,0,c.width,c.height),d=im.data;
+  for(let i=0;i<d.length;i+=4){let g=.299*d[i]+.587*d[i+1]+.114*d[i+2];if(mode)g=g<150?0:g>210?255:(g-150)*4.25;d[i]=d[i+1]=d[i+2]=g}
+  x.putImageData(im,0,0);return c;
+}
+async function leerInforme(file,onP){
+  const T=await loadTess();
+  // Dos lecturas con distinto contraste: cada una capta números que la otra a veces pierde
+  let pass=0;
+  const w=await T.createWorker("eng",1,{logger:m=>{if(m.status==="recognizing text")onP(Math.round((pass+m.progress)*50))}});
+  try{await w.setParameters({tessedit_pageseg_mode:"3",preserve_interword_spaces:"1"});
+    const bmp=await createImageBitmap(file);
+    const a=parseInsait((await w.recognize(await prepImg(bmp,0))).data.text); pass=1;
+    const b=parseInsait((await w.recognize(await prepImg(bmp,1))).data.text);
+    // Por cada dato, la primera lectura que dé un valor razonable
+    const ok=(k,v)=>{const R=RANGO[k];return v!=null&&(!R||(v>=R[0]&&v<=R[1]))};
+    const out={};[...new Set([...Object.keys(a),...Object.keys(b)])].forEach(k=>{const v=ok(k,a[k])?a[k]:ok(k,b[k])?b[k]:null;if(v!=null)out[k]=v});
+    if(out.distancia_m!=null&&out.dist_alta_vel_m!=null&&out.distancia_m<out.dist_alta_vel_m)delete out.distancia_m;
+    if(out.pie_izq_pct!=null)out.pie_der_pct=100-out.pie_izq_pct;
+    return out}
+  finally{w.terminate()}
+}
+function canilleraForm(p){
+  const f0=p.fisico||{}; let vals={...f0};
+  const minDef=f0.minutos_reales||"";
+  const draw=(miss)=>{$("#cFields").innerHTML=CF.map(([t,fs])=>`<div class="csec">${t}</div><div class="cgrid">${fs.map(([k,l])=>
+    k==="nota"?`<label>${l}<select id="cf_${k}">${["","A","B+","B","C+","C"].map(o=>`<option${(vals[k]||"")===o?" selected":""}>${o}</option>`).join("")}</select></label>`
+    :`<label>${l}<input id="cf_${k}" inputmode="decimal" value="${vals[k]??""}" class="${miss&&vals[k]==null?"miss":""}"></label>`).join("")}</div>`).join("")};
+  $("#ov").innerHTML=`<form class="form" id="fC"><div class="wrap">
+    <h3>Canilleras · vs ${esc(p.rival)}</h3>
+    <label class="shot">📷 Subir captura del informe de INSAIT<input type="file" accept="image/*" id="cImg"></label>
+    <div class="status" id="cSt" style="padding:0">${f0.puntuacion?"Este partido ya tiene datos. Si subís otra captura, se reemplazan.":"La app lee los números de la captura. Revisalos antes de guardar."}</div>
+    <div class="three">
+      <label>Fecha y hora<input id="cf_fecha_hora" value="${esc(vals.fecha_hora||"")}" placeholder="2026-11-14 22:31"></label>
+      <label>Tiempo canillera<input id="cf_tiempo" value="${esc(vals.tiempo_canillera||vals.tiempo||"")}" placeholder="139'31''"></label>
+      <label>Minutos reales<input id="cMin" type="number" inputmode="numeric" min="1" value="${esc(minDef)}" placeholder="Ej: 50"></label>
+    </div>
+    <label>Tipo<select id="cf_tipo"><option${vals.tipo!=="Train"?" selected":""}>Match</option><option${vals.tipo==="Train"?" selected":""}>Train</option></select></label>
+    <div id="cFields" style="display:grid;gap:6px"></div>
+    <label>Distancia por minuto<input id="cf_dist_por_min_m" inputmode="decimal" value="${vals.dist_por_min_m??""}"></label>
+    <p class="status" style="margin:0">Si la canillera quedó prendida después del partido, poné los <b>minutos reales</b> y la distancia por minuto se recalcula sola.</p>
+    <div class="err" id="cErr"></div>
+    <div class="actions">${f0.puntuacion?`<button type="button" class="btn danger" id="cDel">Borrar datos</button>`:""}
+      <div class="r"><button type="button" class="btn" id="cCancel">Cancelar</button><button class="btn primary">Guardar</button></div></div>
+  </div></form>`;
+  $("#ov").hidden=false; $("#cCancel").onclick=close; draw(false);
+  const recalc=()=>{const m=+$("#cMin").value, d=+$("#cf_distancia_m").value; if(m>0&&d>0)$("#cf_dist_por_min_m").value=Math.round(d/m)};
+  $("#cMin").addEventListener("input",recalc); $("#cFields").addEventListener("input",e=>{if(e.target.id==="cf_distancia_m")recalc()});
+  $("#cImg").onchange=async e=>{const f=e.target.files[0];if(!f)return;$("#cErr").textContent="";
+    $("#cSt").textContent="Leyendo la captura… (la primera vez tarda un poco más)";
+    try{const r=await leerInforme(f,pc=>{$("#cSt").textContent=`Leyendo la captura… ${pc}%`});
+      vals={...r}; draw(true);
+      $("#cf_fecha_hora").value=r.fecha_hora||""; $("#cf_tiempo").value=r.tiempo||""; $("#cf_tipo").value=r.tipo||"Match";
+      $("#cf_dist_por_min_m").value=r.dist_por_min_m??""; recalc();
+      const faltan=CF.flatMap(x=>x[1]).filter(([k])=>k!=="nota"&&r[k]==null).length;
+      $("#cSt").innerHTML=faltan?`Listo. <b>${faltan} dato${faltan>1?"s":""} no se ${faltan>1?"pudieron":"pudo"} leer</b> (marcados en amarillo): completalos mirando la captura.`:"Listo. Revisá que los números coincidan con la captura y guardá.";
+    }catch(err){$("#cSt").textContent="";$("#cErr").textContent=(err.message||"No se pudo leer la imagen.")+" Podés cargar los números a mano."}
+    e.target.value=""};
+  if($("#cDel")){let armed=false;$("#cDel").onclick=async()=>{if(!armed){armed=true;$("#cDel").textContent="¿Seguro? Tocá de nuevo";return}
+    try{const cur=partidos.find(x=>x.id===p.id)||p;const {id,fisico,...rest}=cur;await db.doc("partidos/"+p.id).set(rest);close()}catch(e){$("#cErr").textContent="No se pudo borrar."}}}
+  $("#fC").onsubmit=async e=>{e.preventDefault();
+    const out={fuente:"INSAIT JOY"};
+    const num=v=>{v=String(v).trim().replace(",",".");return v===""?null:+v};
+    CF.flatMap(x=>x[1]).forEach(([k])=>{const el=$("#cf_"+k);if(!el)return;const v=k==="nota"?el.value:num(el.value);if(v!==null&&v!==""&&!(typeof v==="number"&&isNaN(v)))out[k]=v});
+    const dpm=num($("#cf_dist_por_min_m").value);if(dpm!=null&&!isNaN(dpm))out.dist_por_min_m=dpm;
+    const fh=$("#cf_fecha_hora").value.trim();if(fh)out.fecha_hora=fh;
+    out.tipo=$("#cf_tipo").value;
+    const tc=$("#cf_tiempo").value.trim(), m=+$("#cMin").value;
+    if(m>0){out.minutos_reales=m;out.tiempo=`${m}'`;if(tc)out.tiempo_canillera=tc}else if(tc)out.tiempo=tc;
+    if(out.puntuacion==null){$("#cErr").textContent="Falta la nota (el número sobre 100).";return}
+    if(!out.nota){const s2=out.puntuacion;out.nota=s2>=75?"A":s2>=65?"B+":s2>=55?"B":s2>=40?"C+":"C"}
+    const btn=e.target.querySelector(".btn.primary");btn.disabled=true;btn.textContent="Guardando…";
+    try{await db.doc("partidos/"+p.id).update({fisico:out,jugo:true});close();render()}
+    catch(err){btn.disabled=false;btn.textContent="Guardar";$("#cErr").textContent="No se pudo guardar. Probá de nuevo."}};
 }
 
 /* ---------- Importar (desde la portada de Claude) ---------- */
