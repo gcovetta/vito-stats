@@ -276,7 +276,56 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
 .hbar b{font-family:var(--display);font-size:17px;font-weight:800;text-align:right}
 .next{border-color:var(--accent)!important}
 .next .when{margin-left:auto;font-family:var(--display);font-weight:800;font-size:20px;line-height:1;text-align:right;text-transform:uppercase;flex:none}
-.ach{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.ach{display:grid;gap:12px}
+.achp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.acb{display:block;width:80%;height:5px;border-radius:3px;background:var(--line);overflow:hidden;margin-top:2px}
+.acb i{display:block;height:100%;background:var(--accent);border-radius:3px}
+.achok .lt{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.achd{display:flex;flex-wrap:wrap;gap:6px}
+.acd{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;background:color-mix(in srgb,var(--accent) 22%,var(--surface));border:1px solid var(--accent);border-radius:999px;padding:3px 9px 3px 5px}
+.acd svg{width:14px;height:14px}
+.hit{fill:transparent;cursor:pointer;stroke:none}
+circle.hit.on{fill:color-mix(in srgb,var(--accent) 30%,transparent)}
+rect.hit.on{fill:color-mix(in srgb,var(--fg) 8%,transparent)}
+.ctip{position:fixed;z-index:30;background:var(--fg);color:var(--bg);border-radius:10px;padding:8px 10px;font-size:12px;line-height:1.35;display:grid;gap:1px;max-width:220px;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.25)}
+.ctip b{font-family:var(--display);font-size:18px;font-weight:800}
+body.ro #addP,body.ro #addT,body.ro #impBtn,body.ro .edonly,body.ro .step,body.ro [data-editp].linkbtn{display:none!important}
+.xbtns{display:grid;grid-template-columns:1fr 1fr;gap:8px}.xbtns .btn{height:50px}
+.albh{display:grid;gap:6px;margin-bottom:12px}.albh b{font-family:var(--display);font-size:28px;font-weight:800}
+.figs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.fig{position:relative;aspect-ratio:3/4;border-radius:12px;border:0;padding:8px 6px 6px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;color:#f4f8f2;background:#14402a;overflow:hidden;min-width:0;font:inherit;cursor:pointer;text-align:center}
+.fig .fn{position:absolute;top:5px;left:7px;font-family:var(--display);font-weight:800;font-size:13px;opacity:.85}
+.fig .fcr{position:absolute;top:4px;right:4px}.fig .fcr .crest{border-width:1px}
+.fig>*{flex-shrink:0}
+.fig .fph{width:44%;aspect-ratio:1;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.8);margin-top:14px;margin-bottom:2px;background:#0b2617;display:grid;place-items:center;font-family:var(--display);font-weight:800}
+.fig .fnm{font-family:var(--display);font-weight:800;font-size:15px;text-transform:uppercase;line-height:1}
+.fig .fr{font-size:10px;line-height:1.1;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fig .fs{font-family:var(--display);font-weight:800;font-size:15px;line-height:1}
+.fig .fs i{font-style:normal;font-size:10px;border-radius:3px;padding:0 3px;margin-left:2px;background:rgba(255,255,255,.2)}
+.fig .fb{line-height:1}.fig .fb .ball{width:10px;height:10px;margin:0}
+.fig .fd{font-size:9px;opacity:.8;margin-top:auto}
+.fig.t-base{background:linear-gradient(160deg,#f4f8f2,#cfd8cc);color:#14201a}.fig.t-base .fph{border-color:#1f5a34}
+.fig.t-gol{background:linear-gradient(160deg,#2e8b3d,#14402a)}
+.fig.t-oro{background:linear-gradient(160deg,#f7d56a,#b88a12);color:#1d1600;box-shadow:0 0 0 2px #f7d56a inset}.fig.t-oro .fph{border-color:#fff}
+.fig.t-holo{background:linear-gradient(135deg,#b8f0ff,#c9a2ff 45%,#ffd1f0 70%,#b8f0ff);color:#0d1b2a}
+.fig.t-copa{background:radial-gradient(circle at 50% 30%,#ffe28a,#e8b923 60%,#b88a12);color:#1d1600}
+.fig.vac{background:transparent;border:2px dashed var(--line);color:var(--muted);cursor:default;justify-content:center}.fig.vac b{font-family:var(--display);font-size:34px}
+.figleg{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:11px;color:var(--muted)}.figleg span{display:inline-flex;align-items:center;gap:5px}
+.figleg .sw{width:14px;height:18px;border-radius:3px;display:inline-block}
+.sw.t-oro{background:#e8b923}.sw.t-holo{background:linear-gradient(135deg,#b8f0ff,#c9a2ff)}.sw.t-copa{background:#f7d56a}.sw.t-gol{background:#2e8b3d}.sw.t-base{background:#e3e9e0;border:1px solid var(--line)}
+.wrapv{position:fixed;inset:0;z-index:40;color:#fff;display:flex;flex-direction:column;transition:background .4s;padding:calc(env(safe-area-inset-top,0px) + 10px) max(16px,env(safe-area-inset-right,0px)) calc(env(safe-area-inset-bottom,0px) + 20px) max(16px,env(safe-area-inset-left,0px))}
+.wbars{display:flex;gap:4px}.wbars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);overflow:hidden}.wbars i b{display:block;height:100%;width:0;background:#fff}
+.wbars i.done b{width:100%}.wbars i.now b{animation:wfill 6s linear forwards}@keyframes wfill{to{width:100%}}
+.wx{position:absolute;top:calc(env(safe-area-inset-top,0px) + 22px);right:max(16px,env(safe-area-inset-right,0px));z-index:3;background:rgba(0,0,0,.25);border:0;color:#fff;width:40px;height:40px;border-radius:50%;font-size:18px}
+.wbody{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;position:relative;z-index:2;pointer-events:none}
+.wbody .btn,.wbody a{pointer-events:auto}
+.wph{width:160px;height:160px;border-radius:50%;object-fit:cover;border:4px solid #f0c544}
+.wt{font-family:var(--display);font-weight:700;font-size:26px;text-transform:uppercase;letter-spacing:.06em;opacity:.9}
+.wbig{font-family:var(--display);font-weight:800;font-size:clamp(56px,20vw,120px);line-height:.95;max-width:100%;overflow-wrap:anywhere}
+.wsub{font-size:17px;max-width:30ch;opacity:.9}
+.wlist{font-family:var(--display);font-weight:800;font-size:40px;line-height:1.2}
+.wprev,.wnext{position:absolute;top:70px;bottom:120px;width:35%;background:none;border:0;z-index:1}.wprev{left:0}.wnext{right:0;width:65%}
+@media (prefers-reduced-motion:reduce){.wbars i.now b{animation:none;width:100%}}
 .ac{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 6px;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;min-width:0}
 .ac .ai{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--bg);color:var(--muted);border:2px dashed var(--line)}
 .ac .ai svg{width:24px;height:24px}
@@ -369,12 +418,12 @@ input,select,textarea{background:var(--bg);border:1px solid var(--line);border-r
   <section><h2>Cómo hace los goles</h2><div class="how" id="how"></div></section>
   <section id="diaSec" hidden><h2>Diario de Vito <small>cómo se sintió</small></h2><div class="sheet" id="diario"></div></section>
   <section id="trySec" hidden><h2>Trayectoria</h2><div class="lines" id="tray"></div></section>
-  <section><button type="button" class="btn primary" id="seasonBtn" style="width:100%;height:50px">Ver resumen de la temporada</button></section>
+  <section class="xbtns"><button type="button" class="btn primary" id="wrapBtn">Vito Wrapped</button><button type="button" class="btn primary" id="albBtn">Álbum de figuritas</button><button type="button" class="btn" id="seasonBtn" style="grid-column:1/-1">Ver resumen de la temporada</button></section>
   <section>
     <h2>Ajustes</h2>
     <div class="settings">
       <div class="who" id="whoAmI"></div>
-      <label class="btn" style="display:grid;place-items:center;color:var(--fg);font-size:15px;cursor:pointer">Cambiar foto de Vito<input type="file" accept="image/*" id="fotoIn" hidden></label>
+      <label class="btn edonly" style="display:grid;place-items:center;color:var(--fg);font-size:15px;cursor:pointer">Cambiar foto de Vito<input type="file" accept="image/*" id="fotoIn" hidden></label>
       <button type="button" class="btn" id="pushBtn">Activar avisos de partido en este teléfono</button>
       <div class="who" id="pushMsg"></div>
       <div class="two"><button type="button" class="btn" id="impBtn">Importar datos</button><button type="button" class="btn" id="outBtn">Cerrar sesión</button></div>
@@ -547,7 +596,13 @@ function baseStats(){
   const mx=k=>Math.max(0,...L.map(x=>+x[k]||0));
   const nv=partidos.reduce((a,p)=>a+(p.videos||[]).filter(Boolean).length,0);
   const asist=partidos.reduce((a,p)=>a+(+p.asist||0),0);
-  return {tot,ct,hat,pok,tit,maxT,L,vmax:mx("vel_max_kmh"),dmax:mx("distancia_m"),nmax:mx("puntuacion"),nv,asist,best:racha().best};
+  const dob=partidos.filter(p=>(p.golesVito||0)>=2).length, man=partidos.filter(p=>(p.golesVito||0)>=5).length;
+  const clubsG=new Set(partidos.filter(p=>p.golesVito>0).map(p=>p.club)).size;
+  const rivG=new Set(partidos.filter(p=>p.golesVito>0&&p.rival).map(p=>rivKey(p.rival))).size;
+  const visG=partidos.filter(p=>p.visitante).reduce((a,p)=>a+(p.golesVito||0),0);
+  const nA=L.filter(x=>+x.puntuacion>=75).length;
+  return {tot,ct,hat,pok,tit,maxT,L,vmax:mx("vel_max_kmh"),dmax:mx("distancia_m"),nmax:mx("puntuacion"),nv,asist,best:racha().best,
+    dob,man,clubsG,rivG,visG,nA,izq:mx("pie_izq_pct"),pat:mx("patada_max_kg"),salto:mx("salto_max_cm"),piq:mx("piques"),nL:L.length};
 }
 function renderExtras(){
   const S=baseStats(), c=k=>S.ct[k]||0;
@@ -575,9 +630,37 @@ function renderExtras(){
     ["cam","Gol filmado","Subir el video de un gol",S.nv>=1],
     ["star","En racha","Convertir en 3 partidos seguidos",S.best>=3,S.best,3],
     ["star","Asistidor","Dar 5 asistencias",S.asist>=5,S.asist,5],
+    ["ball","75 goles","Llegar a 75 goles",S.tot>=75,S.tot,75],
+    ["ball","Doblete","2 goles en un partido",S.dob>=1],
+    ["ball","Diez dobletes","10 partidos con 2 goles o más",S.dob>=10,S.dob,10],
+    ["star","Manito","5 goles en un partido",S.man>=1],
+    ["bolt","Olímpico x3","3 goles olímpicos",c("Olímpico")>=3,c("Olímpico"),3],
+    ["bolt","Cabeceador","5 goles de cabeza",c("Cabeza")>=5,c("Cabeza"),5],
+    ["bolt","Especialista","3 goles de tiro libre",c("Tiro libre")>=3,c("Tiro libre"),3],
+    ["bolt","Cañonero","5 goles de lejos",c("De lejos")>=5,c("De lejos"),5],
+    ["bolt","Picadita","Gol de picada",c("Picada")>=1],
+    ["ball","Goleador visitante","10 goles de visitante",S.visG>=10,S.visG,10],
+    ["ball","Para todos","Goles a 10 rivales distintos",S.rivG>=10,S.rivG,10],
+    ["ball","En los dos clubes","Hacer goles en 2 clubes",S.clubsG>=2,S.clubsG,2],
+    ["cup","Tricampeón","Ganar 3 títulos",S.tit>=3,S.tit,3],
+    ["star","Racha de 5","Convertir en 5 partidos seguidos",S.best>=5,S.best,5],
+    ["star","Asistidor x10","Dar 10 asistencias",S.asist>=10,S.asist,10],
+    ["bolt","Bala","Llegar a 28 km/h",S.vmax>=28,S.vmax,28],
+    ["bolt","Maratonista","Correr 6 km en un partido",S.dmax>=6000,(S.dmax/1000).toFixed(1).replace(".",","),6],
+    ["bolt","Cañón","Patada de 150 kg",S.pat>=150,S.pat,150],
+    ["bolt","Resorte","Salto de 40 cm en un partido",S.salto>=40,S.salto,40],
+    ["bolt","Explosivo","20 piques en un partido",S.piq>=20,S.piq,20],
+    ["bolt","Zurdo también","Usar 40% la izquierda en un partido",S.izq>=40,S.izq,40],
+    ["star","Crack","Nota 85 o más en un partido",S.nmax>=85,S.nmax,85],
+    ["star","Regular","5 partidos con nota A",S.nA>=5,S.nA,5],
+    ["star","Bien medido","20 partidos con las canilleras",S.nL>=20,S.nL,20],
+    ["cam","Videoteca","Subir 10 videos de goles",S.nv>=10,S.nv,10],
   ];
-  $("#achN").textContent=`${A.filter(a=>a[3]).length} de ${A.length}`;
-  $("#ach").innerHTML=[...A].sort((a,b)=>b[3]-a[3]).map(([i,t,d,ok,cur,goal])=>`<div class="ac${ok?" on":""}"><span class="ai">${svgI(i)}</span><b>${esc(t)}</b><span class="d">${ok?"Conseguido":esc(d)+(goal&&cur?` · va ${cur} de ${goal}`:"")}</span></div>`).join("");
+  const okA=A.filter(a=>a[3]), pend=A.filter(a=>!a[3]).sort((a,b)=>((+String(b[4]).replace(",",".")||0)/(b[5]||1))-((+String(a[4]).replace(",",".")||0)/(a[5]||1)));
+  $("#achN").textContent=`${okA.length} de ${A.length}`;
+  $("#ach").innerHTML=`<div class="achp">${pend.map(([i,t,d,ok,cur,goal])=>{const pc=goal&&cur?Math.min(100,Math.round((+String(cur).replace(",",".")||0)/goal*100)):0;
+      return `<div class="ac"><span class="ai">${svgI(i)}</span><b>${esc(t)}</b><span class="d">${esc(d)}</span>${goal?`<span class="acb"><i style="width:${pc}%"></i></span><span class="d">${cur||0} de ${goal}</span>`:""}</div>`}).join("")}</div>
+    ${okA.length?`<div class="achok"><div class="lt">Conseguidos · ${okA.length}</div><div class="achd">${okA.map(([i,t])=>`<span class="acd" title="${esc(t)}">${svgI(i)}${esc(t)}</span>`).join("")}</div></div>`:""}`;
   // Comparación: último mes medido vs el anterior
   const byM={};S.L.forEach(x=>(byM[x.fecha.slice(0,7)]=byM[x.fecha.slice(0,7)]||[]).push(x));
   const ms=Object.keys(byM).sort(); $("#cmpSec").hidden=ms.length<2;
@@ -684,6 +767,152 @@ async function placa(id){
   const dl=$("#plDl");dl.href=url;dl.download=name;dl.hidden=false;
   const file=new File([blob],name,{type:"image/png"});
   if(navigator.canShare&&navigator.canShare({files:[file]})){const b=$("#plSh");b.hidden=false;b.onclick=async()=>{try{await navigator.share({files:[file]})}catch(e){if(e&&e.name!=="AbortError")$("#plErr").textContent="No se pudo compartir. Usá Descargar."}}}
+}
+
+
+/* ---------- Álbum de figuritas ---------- */
+const jugo=p=>p.gf!=null&&p.gc!=null&&p.jugo!==false&&p.minutos!=="No jugó";
+function figTier(p){const t=p.tipos||[];if((p.golesVito||0)>=3)return"oro";if(t.includes("Olímpico"))return"holo";if(p.golesVito)return"gol";return"base"}
+const TIER={oro:"Dorada · hat-trick",holo:"Brillante · olímpico",gol:"Con gol",base:"Partido",copa:"Campeón"};
+function albumItems(Y){
+  const P=partidos.filter(p=>(p.fecha||"").startsWith(Y)).sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const it=[];P.forEach(p=>{if(jugo(p))it.push({k:"p",p,tier:figTier(p)});else if(p.gf==null&&p.jugo!==false)it.push({k:"v",p})});
+  torneos.filter(t=>t.campeon&&String(t.temporada||Y)===Y).forEach(t=>it.push({k:"c",t,tier:"copa"}));
+  let n=0;it.forEach(x=>{x.n=++n});return it}
+function figHTML(x,big){
+  const nm=(jugador?.nombre||"Vito").split(" ")[0];
+  const foto=jugador?.foto?`<img class="fph" src="${esc(jugador.foto)}" alt="">`:`<div class="fph">${esc(nm[0])}</div>`;
+  if(x.k==="v")return `<div class="fig vac"><span class="fn">${x.n}</span><b>?</b><span class="fr">vs ${esc(rivName(x.p.rival))}</span><span class="fd">${x.p.fecha?fmtF(x.p.fecha):"Próximamente"}</span></div>`;
+  if(x.k==="c")return `<button type="button" class="fig t-copa${big?" big":""}" data-fig="c:${esc(x.t.id)}"><span class="fn">${x.n}</span>${foto}<span class="fnm">${esc(nm)}</span><span class="fr">Campeón</span><span class="fs">${esc(x.t.nombre)}</span><span class="fcr">${crest(x.t.club,22)}</span></button>`;
+  const p=x.p,g=p.golesVito||0,res=p.gf>p.gc?"G":p.gf<p.gc?"P":"E";
+  return `<button type="button" class="fig t-${x.tier}${big?" big":""}" data-fig="p:${esc(p.id)}"><span class="fn">${x.n}</span><span class="fcr">${crest(p.club,22)}</span>${foto}<span class="fnm">${esc(nm)}</span>
+    <span class="fr">vs ${esc(rivName(p.rival))}</span><span class="fs">${p.gf}–${p.gc} <i class="r${res}">${res}</i></span>
+    <span class="fb">${g?BALL.repeat(Math.min(g,5)):"&nbsp;"}</span><span class="fd">${fmtF(p.fecha)}</span></button>`}
+function albumView(){
+  const yrs=[...new Set(partidos.map(p=>(p.fecha||"").slice(0,4)).filter(Boolean))].sort();let Y=yrs[yrs.length-1]||String(new Date().getFullYear());
+  const draw=()=>{const it=albumItems(Y),got=it.filter(x=>x.k!=="v").length,sp=it.filter(x=>x.tier==="oro"||x.tier==="holo"||x.tier==="copa").length;
+    $("#alb").innerHTML=`<div class="albh"><div><b>${got}</b> de ${it.length} figuritas</div><div class="acb" style="width:100%;height:8px"><i style="width:${it.length?Math.round(got/it.length*100):0}%"></i></div><span class="d">${sp} especiales · las que faltan son los partidos que vienen</span></div>
+      <div class="figs">${it.map(x=>figHTML(x)).join("")}</div>
+      <div class="figleg">${["oro","holo","copa","gol","base"].map(t=>`<span><i class="sw t-${t}"></i>${TIER[t]}</span>`).join("")}</div>`};
+  $("#ov").innerHTML=`<div class="form"><div class="wrap"><h3 style="display:flex;justify-content:space-between;align-items:center;gap:8px">Álbum ${yrs.length>1?`<select id="albY" style="width:auto">${yrs.map(y=>`<option${y===Y?" selected":""}>${y}</option>`).join("")}</select>`:Y}</h3><div id="alb"></div>
+    <div class="actions"><div class="r"><button type="button" class="btn" id="albX">Cerrar</button></div></div></div></div>`;
+  $("#ov").hidden=false;$("#albX").onclick=close;if($("#albY"))$("#albY").onchange=e=>{Y=e.target.value;draw()};draw();
+  $("#alb").onclick=e=>{const f=e.target.closest("[data-fig]");if(f)figDetail(f.dataset.fig,()=>albumView())};
+}
+async function figDetail(key,back){
+  const [k,id]=key.split(":");const Y=(k==="p"?(partidos.find(p=>p.id===id)||{}).fecha||"":"").slice(0,4)||String(new Date().getFullYear());
+  const x=albumItems(Y).find(i=>k==="p"?i.p&&i.p.id===id:i.t&&i.t.id===id);if(!x)return;
+  $("#ov").innerHTML=`<div class="form"><div class="wrap"><h3>Figurita ${x.n} · ${TIER[x.tier]}</h3><div id="figc" class="empty">Armando la figurita…</div><div class="err" id="fgErr"></div>
+    <div class="actions"><div class="r"><button type="button" class="btn" id="fgB">Volver</button><a class="btn" id="fgDl" hidden style="display:grid;place-items:center;text-decoration:none;color:var(--fg)">Descargar</a><button type="button" class="btn primary" id="fgSh" hidden>Compartir</button></div></div></div></div>`;
+  $("#ov").hidden=false;$("#fgB").onclick=back;
+  const blob=await drawFig(x);if(!$("#figc"))return;
+  const url=URL.createObjectURL(blob),name=`figurita-${x.n}.png`;
+  $("#figc").className="";$("#figc").innerHTML=`<img alt="Figurita" src="${url}" style="width:100%;max-width:380px;display:block;margin:0 auto;border-radius:14px">`;
+  shareBtns(blob,name,"#fgDl","#fgSh","#fgErr");
+}
+function shareBtns(blob,name,dl,sh,er){const url=URL.createObjectURL(blob);const d=$(dl);d.href=url;d.download=name;d.hidden=false;
+  const file=new File([blob],name,{type:"image/png"});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){const b=$(sh);b.hidden=false;b.onclick=async()=>{try{await navigator.share({files:[file]})}catch(e){if(e&&e.name!=="AbortError")$(er).textContent="No se pudo compartir. Usá Descargar."}}}}
+const loadImg=src=>new Promise(r=>{if(!src)return r(null);const i=new Image();i.onload=()=>r(i);i.onerror=()=>r(null);i.src=src});
+async function drawFig(x){
+  const W=900,H=1260,c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
+  try{await document.fonts.load('800 100px "Barlow Condensed"')}catch(_){}
+  const F=(w,s)=>`${w} ${s}px "Barlow Condensed","Arial Narrow",sans-serif`;
+  const pal={oro:["#f7d56a","#b88a12","#1d1600"],holo:["#b8f0ff","#c9a2ff","#0d1b2a"],copa:["#ffe28a","#e8b923","#1d1600"],gol:["#2e8b3d","#14402a","#f4f8f2"],base:["#f4f8f2","#cfd8cc","#14201a"]}[x.tier];
+  const gr=g.createLinearGradient(0,0,W,H);gr.addColorStop(0,pal[0]);gr.addColorStop(1,pal[1]);g.fillStyle=gr;g.beginPath();g.roundRect(0,0,W,H,48);g.fill();
+  if(x.tier==="holo"){for(let i=-H;i<W;i+=70){g.fillStyle=`hsla(${(i+H)%360},90%,70%,.18)`;g.beginPath();g.moveTo(i,0);g.lineTo(i+35,0);g.lineTo(i+35+H*.5,H);g.lineTo(i+H*.5,H);g.fill()}}
+  g.fillStyle="rgba(10,30,18,.92)";g.beginPath();g.roundRect(36,36,W-72,H-72,32);g.fill();
+  g.textAlign="center";g.textBaseline="middle";
+  g.fillStyle=pal[0];g.font=F(800,64);g.textAlign="left";g.fillText("#"+x.n,80,110);g.textAlign="center";
+  const club=x.k==="c"?x.t.club:x.p.club, logo=await loadImg(clubes[slug(club)]?.logo), foto=await loadImg(jugador?.foto);
+  if(logo){g.save();g.beginPath();g.arc(W-130,110,58,0,7);g.fillStyle="#fff";g.fill();g.clip();g.drawImage(logo,W-188,52,116,116);g.restore()}
+  const cy=430,R=230;g.beginPath();g.arc(W/2,cy,R+14,0,7);g.fillStyle=pal[0];g.fill();
+  g.save();g.beginPath();g.arc(W/2,cy,R,0,7);g.clip();if(foto)g.drawImage(foto,W/2-R,cy-R,2*R,2*R);else{g.fillStyle="#14402a";g.fillRect(W/2-R,cy-R,2*R,2*R)}g.restore();
+  const nm=((jugador?.nombre||"Vito").split(" ")[0]).toUpperCase();
+  g.fillStyle="#f4f8f2";g.font=F(800,120);g.fillText(nm,W/2,760);
+  g.fillStyle=pal[0];g.fillRect(W/2-180,830,360,6);
+  if(x.k==="c"){g.fillStyle="#f0c544";g.font=F(800,96);g.fillText("CAMPEÓN",W/2,920);g.fillStyle="#f4f8f2";g.font=F(700,52);g.fillText(String(x.t.nombre).toUpperCase().slice(0,30),W/2,1010)}
+  else{const p=x.p,gv=p.golesVito||0;
+    g.fillStyle="#f4f8f2";let fs=64;g.font=F(700,fs);const rv="VS "+rivName(p.rival).toUpperCase();while(g.measureText(rv).width>720&&fs>36){fs-=4;g.font=F(700,fs)}g.fillText(rv,W/2,885);
+    g.font=F(800,110);g.fillStyle=p.gf>p.gc?"#7fe08f":p.gf<p.gc?"#ff8a8a":"#f0c544";g.fillText(`${p.gf} – ${p.gc}`,W/2,990);
+    if(gv){g.fillStyle="#f0c544";g.font=F(800,58);g.fillText(`${gv} ${gv===1?"GOL":"GOLES"} DE VITO`,W/2,1072)}
+    g.fillStyle="#cfe0d3";g.font=F(600,40);g.fillText((fmtF(p.fecha)+" "+p.fecha.slice(0,4)).toUpperCase(),W/2,1132)}
+  g.fillStyle=pal[0];g.font=F(700,32);g.fillText(TIER[x.tier].toUpperCase(),W/2,H-56);
+  return await new Promise(r=>c.toBlob(r,"image/png"));
+}
+
+/* ---------- Vito Wrapped: resumen de la temporada en historias ---------- */
+function wrapSlides(){
+  const yrs=partidos.map(p=>(p.fecha||"").slice(0,4)).filter(Boolean).sort();const Y=yrs[yrs.length-1]||String(new Date().getFullYear());
+  const T=torneos.filter(t=>String(t.temporada||"")===Y),P=partidos.filter(p=>(p.fecha||"").startsWith(Y)&&jugo(p));
+  const goles=T.reduce((a,t)=>a+(t.goles||0),0)||P.reduce((a,p)=>a+(p.golesVito||0),0);
+  const S=baseStats(),L=S.L.filter(x=>x.fecha.startsWith(Y));
+  const best=[...P].sort((a,b)=>(b.golesVito||0)-(a.golesVito||0))[0];
+  const fav=Object.entries(S.ct).sort((a,b)=>b[1]-a[1])[0];
+  const RV={};P.forEach(p=>{if(p.golesVito){const k=rivName(p.rival);RV[k]=(RV[k]||0)+p.golesVito}});const rv=Object.entries(RV).sort((a,b)=>b[1]-a[1])[0];
+  const CB={};torneos.forEach(t=>{if(String(t.temporada||Y)===Y)CB[t.club]=(CB[t.club]||0)+(t.goles||0)});
+  const km=L.reduce((a,x)=>a+(+x.distancia_m||0),0)/1000, top=k=>L.reduce((b,x)=>(+x[k]||0)>(+b[k]||0)?x:b,L[0]);
+  const tit=torneos.filter(t=>t.campeon&&String(t.temporada||Y)===Y);
+  const nm=(jugador?.nombre||"Vito").split(" ")[0];
+  const sl=[];
+  sl.push({bg:"#14402a",t:`Tu ${Y}`,big:nm.toUpperCase(),sub:"Así fue tu temporada en la cancha",foto:1});
+  sl.push({bg:"#1f5a34",t:"Hiciste",big:goles,sub:`goles en ${P.length} partidos cargados`});
+  if(best&&best.golesVito)sl.push({bg:"#b88a12",t:"Tu mejor partido",big:`${best.golesVito} goles`,sub:`vs ${rivName(best.rival)} · ${fmtF(best.fecha)} · ${best.gf}-${best.gc}`});
+  if(S.hat)sl.push({bg:"#7a1f2b",t:"Hat-tricks",big:S.hat,sub:S.pok?`y ${S.pok} con 4 goles o más`:"partidos con 3 goles o más"});
+  if(fav)sl.push({bg:"#24406b",t:"Tu gol preferido",big:fav[0],sub:`${fav[1]} ${fav[1]===1?"vez":"veces"}${S.ct["Olímpico"]?` · y ${S.ct["Olímpico"]} olímpico${S.ct["Olímpico"]>1?"s":""}`:""}`});
+  if(rv)sl.push({bg:"#5b2a86",t:"Tu víctima favorita",big:rv[0],sub:`le hiciste ${rv[1]} ${rv[1]===1?"gol":"goles"}`});
+  const cbs=Object.entries(CB).filter(x=>x[1]);if(cbs.length)sl.push({bg:"#14402a",t:"Goles por club",list:cbs.sort((a,b)=>b[1]-a[1]).map(([c,n])=>`${c}: ${n}`),sub:""});
+  if(L.length)sl.push({bg:"#0d3b52",t:"Con las canilleras",big:`${km.toFixed(1).replace(".",",")} km`,sub:`corridos en ${L.length} partidos · velocidad máx ${top("vel_max_kmh").vel_max_kmh} km/h · patada ${top("patada_max_kg").patada_max_kg} kg`});
+  if(tit.length)sl.push({bg:"#b88a12",t:tit.length===1?"Campeón":"Campeón x"+tit.length,big:tit.map(t=>t.nombre).join(" · "),sub:"",cup:1});
+  const rc=racha();if(rc.best>=2)sl.push({bg:"#7a1f2b",t:"Racha goleadora",big:`${rc.best} partidos`,sub:"seguidos haciendo goles"});
+  sl.push({bg:"#14402a",t:"Gracias por otro año",big:`${goles} goles`,sub:`${nm} · ${jugador?.numero||10}`,foto:1,end:1});
+  return {sl,Y,goles,P,S,best,fav,rv,km,L,tit,nm};
+}
+function wrappedView(){
+  const W=wrapSlides();let i=0,tm=null;
+  let el=$("#wrap");if(!el){el=document.createElement("div");el.id="wrap";el.className="wrapv";document.body.appendChild(el)}
+  const foto=jugador?.foto?`<img class="wph" src="${esc(jugador.foto)}" alt="">`:"";
+  const go=n=>{i=Math.max(0,Math.min(W.sl.length-1,n));const s=W.sl[i];clearTimeout(tm);
+    el.style.background=s.bg;
+    el.innerHTML=`<div class="wbars">${W.sl.map((_,k)=>`<i class="${k<i?"done":k===i?"now":""}"><b></b></i>`).join("")}</div>
+      <button type="button" class="wx" aria-label="Cerrar">✕</button>
+      <div class="wbody">${s.foto?foto:""}<div class="wt">${esc(s.t)}</div>${s.big!==undefined&&s.big!==""?`<div class="wbig">${esc(s.big)}</div>`:""}
+      ${s.list?`<div class="wlist">${s.list.map(x=>`<div>${esc(x)}</div>`).join("")}</div>`:""}<div class="wsub">${esc(s.sub||"")}</div>
+      ${s.end?`<button type="button" class="btn primary wsh">Compartir resumen</button><div class="err" id="wErr"></div><div id="wImg"></div>`:""}</div>
+      <button type="button" class="wprev" aria-label="Anterior"></button><button type="button" class="wnext" aria-label="Siguiente"></button>`;
+    el.querySelector(".wx").onclick=()=>{clearTimeout(tm);el.remove()};
+    el.querySelector(".wprev").onclick=()=>go(i-1);el.querySelector(".wnext").onclick=()=>{if(i<W.sl.length-1)go(i+1)};
+    if(s.end){el.querySelector(".wnext").hidden=true;el.querySelector(".wsh").onclick=async e=>{e.target.disabled=true;e.target.textContent="Armando imagen…";
+      const blob=await drawWrap(W);const file=new File([blob],`vito-${W.Y}.png`,{type:"image/png"});
+      if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file]})}catch(_){}}
+      else{const u=URL.createObjectURL(blob);$("#wImg").innerHTML=`<a href="${u}" download="vito-${W.Y}.png" class="btn" style="display:grid;place-items:center;margin-top:8px;color:var(--fg);text-decoration:none">Descargar imagen</a>`}
+      e.target.disabled=false;e.target.textContent="Compartir resumen"}}
+    else tm=setTimeout(()=>go(i+1),6000)};
+  document.addEventListener("keydown",function k(e){if(!document.getElementById("wrap")){document.removeEventListener("keydown",k);return}if(e.key==="ArrowRight")go(i+1);if(e.key==="ArrowLeft")go(i-1);if(e.key==="Escape"){clearTimeout(tm);el.remove()}});
+  go(0);
+}
+async function drawWrap(W){
+  const w=1080,h=1920,c=document.createElement("canvas");c.width=w;c.height=h;const g=c.getContext("2d");
+  try{await document.fonts.load('800 100px "Barlow Condensed"')}catch(_){}
+  const F=(t,s)=>`${t} ${s}px "Barlow Condensed","Arial Narrow",sans-serif`;
+  const gr=g.createLinearGradient(0,0,0,h);gr.addColorStop(0,"#2a7a45");gr.addColorStop(1,"#0b2617");g.fillStyle=gr;g.fillRect(0,0,w,h);
+  g.textAlign="center";g.textBaseline="middle";
+  const foto=await loadImg(jugador?.foto);
+  g.fillStyle="#f0c544";g.font=F(800,60);g.fillText(`TEMPORADA ${W.Y}`,w/2,120);
+  if(foto){g.beginPath();g.arc(w/2,360,190,0,7);g.fillStyle="#f0c544";g.fill();g.save();g.beginPath();g.arc(w/2,360,178,0,7);g.clip();g.drawImage(foto,w/2-178,182,356,356);g.restore()}
+  g.fillStyle="#f4f8f2";g.font=F(800,130);g.fillText(W.nm.toUpperCase(),w/2,640);
+  g.font=F(800,300);g.fillText(W.goles,w/2,860);g.font=F(700,64);g.fillStyle="#cfe0d3";g.fillText("GOLES",w/2,1020);
+  const rows=[];
+  if(W.best&&W.best.golesVito)rows.push(["MEJOR PARTIDO",`${W.best.golesVito} vs ${rivName(W.best.rival)}`]);
+  if(W.S.hat)rows.push(["HAT-TRICKS",String(W.S.hat)]);
+  if(W.fav)rows.push(["GOL PREFERIDO",W.fav[0]]);
+  if(W.rv)rows.push(["VÍCTIMA FAVORITA",`${W.rv[0]} (${W.rv[1]})`]);
+  if(W.L.length)rows.push(["CANILLERAS",`${W.km.toFixed(1).replace(".",",")} km · ${Math.max(...W.L.map(x=>+x.vel_max_kmh||0))} km/h`]);
+  if(W.tit.length)rows.push(["TÍTULOS",W.tit.map(t=>t.nombre).join(" · ")]);
+  let y=1130;rows.slice(0,6).forEach(([a,b])=>{g.fillStyle="rgba(0,0,0,.28)";g.beginPath();g.roundRect(90,y,w-180,110,20);g.fill();
+    g.textAlign="left";g.fillStyle="#f0c544";g.font=F(700,34);g.fillText(a,130,y+55);g.textAlign="right";g.fillStyle="#f4f8f2";let fs=48;g.font=F(800,fs);while(g.measureText(b).width>520&&fs>28){fs-=4;g.font=F(800,fs)}g.fillText(b,w-130,y+55);y+=128});
+  g.textAlign="center";g.fillStyle="#cfe0d3";g.font=F(600,36);g.fillText("VITO · 10",w/2,h-70);
+  return await new Promise(r=>c.toBlob(r,"image/png"));
 }
 
 /* ---------- Asistencias, minutos, estrellas, compañeros, racha ---------- */
@@ -855,7 +1084,7 @@ function renderInicio(){
 
 /* ---------- Vito: ficha, gráficos y récords ---------- */
 function fisList(){
-  const a=partidos.filter(p=>p.fisico&&!p.fisico.error_sensor&&p.fisico.puntuacion).map(p=>({...p.fisico,fecha:p.fecha||(p.fisico.fecha_hora||"").slice(0,10),goles:p.golesVito||0,rival:p.rival,club:p.club}));
+  const a=partidos.filter(p=>p.fisico&&!p.fisico.error_sensor&&p.fisico.puntuacion).map(p=>({...p.fisico,fecha:p.fecha||(p.fisico.fecha_hora||"").slice(0,10),goles:p.golesVito||0,rival:p.rival,club:p.club,res:p.gf!=null&&p.gc!=null?`${p.gf>p.gc?"Ganó":p.gf<p.gc?"Perdió":"Empató"} ${p.gf}-${p.gc}`:""}));
   const b=fisCol.filter(f=>f.tipo==="Match"&&f.puntuacion).map(f=>({...f,fecha:(f.fecha_hora||"").slice(0,10),goles:null,rival:null}));
   return [...a,...b].filter(x=>x.fecha).sort((x,y)=>x.fecha.localeCompare(y.fecha));
 }
@@ -874,10 +1103,23 @@ function lineChart(L,key,{unit="",fmt=v=>v,color="var(--pitch)"}={}){
     ${ticks.map(t=>`<line x1="${pl}" x2="${W-pr}" y1="${Y(t)}" y2="${Y(t)}" style="stroke:var(--line)"/><text x="${pl-6}" y="${Y(t)+3}" text-anchor="end" style="fill:var(--muted);font-size:10px">${t}</text>`).join("")}
     <path d="${area}" style="fill:${color};opacity:.12"/>
     <polyline points="${pts}" style="fill:none;stroke:${color};stroke-width:2.5;stroke-linejoin:round"/>
-    ${L.map((x,i)=>`<circle cx="${X(i)}" cy="${Y(+x[key])}" r="${x.goles?5:3.5}" style="fill:${x.goles?"var(--accent)":"var(--surface)"};stroke:${color};stroke-width:2"><title>${fmtF(x.fecha)}${x.rival?" vs "+esc(x.rival):""}: ${fmt(+x[key])}${unit}${x.goles?" · "+x.goles+" gol"+(x.goles>1?"es":""):""}</title></circle>`).join("")}
+    ${L.map((x,i)=>`<circle cx="${X(i)}" cy="${Y(+x[key])}" r="${x.goles?5:3.5}" style="fill:${x.goles?"var(--accent)":"var(--surface)"};stroke:${color};stroke-width:2;pointer-events:none"></circle><circle class="hit" cx="${X(i)}" cy="${Y(+x[key])}" r="11" data-tip="${esc(JSON.stringify(tipData(x,fmt(+x[key])+unit)))}"></circle>`).join("")}
     <text x="${X(best)}" y="${Y(vs[best])-9}" text-anchor="middle" style="fill:var(--fg);font-size:11px;font-weight:700">${fmt(vs[best])}${unit}</text>
     ${mlab.join("")}</svg>`;
 }
+function tipData(x,val){return{f:x.fecha,r:x.rival?rivName(x.rival):"",c:x.club||"",v:val,g:x.goles,n:x.puntuacion,ri:x.res||""}}
+let tipEl=null;
+function showTip(el,ev){const d=JSON.parse(el.dataset.tip);if(!tipEl){tipEl=document.createElement("div");tipEl.className="ctip";document.body.appendChild(tipEl)}
+  const y=d.f?d.f.slice(0,4):"";
+  tipEl.innerHTML=`<b>${d.v}</b><span>${d.f?fmtF(d.f)+" "+y:""}</span>${d.r?`<span>vs ${esc(d.r)}${d.c?" · "+esc(d.c):""}</span>`:d.f&&!d.mes?`<span>Partido sin ubicar</span>`:""}${d.ri?`<span>${esc(d.ri)}</span>`:""}${d.g!=null&&d.g!==""?`<span>${d.g?d.g+" gol"+(d.g>1?"es":"")+" de Vito":"Sin goles de Vito"}</span>`:""}${d.n&&!d.mes?`<span>Nota ${d.n}</span>`:""}`;
+  tipEl.hidden=false;const r=el.getBoundingClientRect(),tw=tipEl.offsetWidth,th=tipEl.offsetHeight;
+  let lx=r.left+r.width/2-tw/2;lx=Math.max(8,Math.min(innerWidth-tw-8,lx));let ly=r.top-th-8;if(ly<8)ly=r.bottom+8;
+  tipEl.style.left=lx+"px";tipEl.style.top=ly+"px";el.parentNode.querySelectorAll(".hit.on").forEach(h=>h.classList.remove("on"));el.classList.add("on")}
+function hideTip(){if(tipEl)tipEl.hidden=true;document.querySelectorAll(".hit.on").forEach(h=>h.classList.remove("on"))}
+document.addEventListener("pointerover",e=>{const h=e.target.closest&&e.target.closest("[data-tip]");if(h&&e.pointerType==="mouse")showTip(h,e)});
+document.addEventListener("pointerout",e=>{const h=e.target.closest&&e.target.closest("[data-tip]");if(h&&e.pointerType==="mouse")hideTip()});
+document.addEventListener("click",e=>{const h=e.target.closest&&e.target.closest("[data-tip]");if(h){showTip(h,e);return}if(tipEl&&!tipEl.hidden)hideTip()},true);
+addEventListener("scroll",()=>{if(tipEl&&!tipEl.hidden)hideTip()},{passive:true});
 function barMeses(){
   const g={};partidos.forEach(p=>{if(p.fecha&&p.golesVito){const k=p.fecha.slice(0,7);g[k]=(g[k]||0)+p.golesVito}});
   const ks=Object.keys(g).sort(); if(!ks.length)return"";
@@ -885,7 +1127,8 @@ function barMeses(){
   while(y<ly||(y===ly&&m<=lm)){all.push(`${y}-${String(m).padStart(2,"0")}`);m++;if(m>12){m=1;y++}}
   const W=340,H=150,pb=22,pt=16,mx=Math.max(...Object.values(g)),bw=(W-20)/all.length;
   return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Goles por mes">${all.map((k,i)=>{const v=g[k]||0,h=(H-pb-pt)*v/mx,x=10+i*bw;
-    return `<rect x="${x+bw*.18}" y="${H-pb-h}" width="${bw*.64}" height="${h}" rx="3" style="fill:var(--pitch)"/>${v?`<text x="${x+bw/2}" y="${H-pb-h-4}" text-anchor="middle" style="fill:var(--fg);font-size:11px;font-weight:700">${v}</text>`:""}<text x="${x+bw/2}" y="${H-6}" text-anchor="middle" style="fill:var(--muted);font-size:10px">${MESES[+k.slice(5)-1]}</text>`}).join("")}</svg>`;
+    const pm=partidos.filter(p=>p.fecha&&p.fecha.startsWith(k)&&p.golesVito).map(p=>`${rivName(p.rival)} ${p.golesVito}`).join(" · ");
+    return `<rect x="${x+bw*.18}" y="${H-pb-h}" width="${bw*.64}" height="${h}" rx="3" style="fill:var(--pitch)"/><rect class="hit" x="${x}" y="${pt}" width="${bw}" height="${H-pb-pt}" data-tip="${esc(JSON.stringify({v:v+" gol"+(v===1?"":"es"),mes:1,r:"",ri:MESES[+k.slice(5)-1]+" "+k.slice(0,4)+(pm?" · "+pm:"")}))}"/>${v?`<text x="${x+bw/2}" y="${H-pb-h-4}" text-anchor="middle" style="fill:var(--fg);font-size:11px;font-weight:700">${v}</text>`:""}<text x="${x+bw/2}" y="${H-6}" text-anchor="middle" style="fill:var(--muted);font-size:10px">${MESES[+k.slice(5)-1]}</text>`}).join("")}</svg>`;
 }
 function renderVito(){
   const L=fisList();
@@ -1285,7 +1528,7 @@ document.addEventListener("click",e=>{
   const rv=e.target.closest("[data-riv]"); if(rv){rivalView(rv.dataset.riv);return}
   const s=e.target.closest("[data-step]"); if(s){step(s.dataset.id,+s.dataset.step);return}
   const ed=e.target.closest("[data-edit]"); if(ed&&canWrite){torneoForm(torneos.find(t=>t.id===ed.dataset.edit));return}
-  const ep=e.target.closest("[data-editp]"); if(ep){partidoForm(partidos.find(x=>x.id===ep.dataset.editp));return}
+  const ep=e.target.closest("[data-editp]"); if(ep&&canWrite){partidoForm(partidos.find(x=>x.id===ep.dataset.editp));return}
   const dp=e.target.closest("[data-delp]"); if(dp){delPartido(dp.dataset.delp,dp);return}
   const tb=e.target.closest("[data-tab]"); if(tb){showTab(tb.dataset.tab,true);return}
   const f=e.target.closest("[data-f]"); if(f){filtro=f.dataset.f;try{localStorage.setItem("vito-filtro",filtro)}catch(_){}render()}
@@ -1294,6 +1537,8 @@ $("#addT").onclick=()=>torneoForm();
 $("#addP").onclick=()=>partidoForm();
 $("#impBtn").onclick=()=>importForm();
 $("#seasonBtn").onclick=()=>seasonView();
+$("#albBtn").onclick=()=>albumView();
+$("#wrapBtn").onclick=()=>wrappedView();
 $("#pSearch").addEventListener("input",e=>{pQuery=e.target.value;render()});
 // Avisos de partido (notificaciones push)
 $("#pushBtn").onclick=async()=>{
@@ -1343,6 +1588,7 @@ let started=false;
 async function start(session){
   $("#login").hidden=true;
   $("#whoAmI").textContent="Conectado como "+(session.user.email||"");
+  try{const {data,error}=await sb.rpc("mi_rol");if(!error&&data==="lector"){canWrite=false;document.body.classList.add("ro");$("#whoAmI").textContent+=" · modo familia: solo para mirar"}else{canWrite=true;document.body.classList.remove("ro")}}catch(_){}
   if(!started){started=true;wire();listen()}
   try{await loadAll();$("#status").textContent=""}catch(e){$("#status").textContent="No se pudieron leer los datos ("+(e.message||e)+").";sync("")}
 }
