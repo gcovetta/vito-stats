@@ -1,6 +1,6 @@
 // Service worker: deja la app instalable y abre aunque no haya señal
 // (muestra lo último que se vio). Los datos siempre se piden frescos a Supabase.
-const CACHE = "vito-v12";
+const CACHE = "vito-v13";
 const SHELL = ["./", "./index.html", "./config.js", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png", "./icons/apple-touch-icon.png"];
 
